@@ -1777,7 +1777,7 @@ function layPhong(){
   try { c = window.claude || (parent !== window && parent.claude) || null; } catch (e){ c = null; }
   if (c && typeof c.use === 'function') return Promise.resolve(c.use('room')).then(function(x){ return x || null; }, function(){ return null; });
   if (cfg && typeof cfg.url === 'string' && /^https:\/\//.test(cfg.url) && cfg.khoa)
-    return napThuVien('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js').then(function(ok){
+    return napThuVien('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.58.0/dist/umd/supabase.js').then(function(ok){
       if (!ok || !window.supabase) return null;
       try { return taoKenh(taoDuongSupabase(cfg)); } catch (e){ return null; }
     });
