@@ -1,0 +1,1346 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#0a0c12">
+<title>Trò Chơi Biên Giới</title>
+<style>
+  :root{
+    --nen:#0a0c12; --nen2:#121622; --vien:#242b3d;
+    --chu:#e8ecf5; --chu-mo:#8d97ae;
+    --nhan:#e4b94a; --do:#e0433c; --xanh:#3fb97a; --lam:#4a8fe0;
+    --an-toan-tren: env(safe-area-inset-top,0px);
+    --an-toan-duoi: env(safe-area-inset-bottom,0px);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0;height:100%;overflow:hidden;background:var(--nen);color:var(--chu);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overscroll-behavior:none}
+  body{user-select:none;-webkit-user-select:none;touch-action:none}
+  .an{display:none !important}
+
+  /* ========== MENU ========== */
+  #manMenu{position:fixed;inset:0;overflow-y:auto;padding:calc(var(--an-toan-tren) + 26px) 18px calc(var(--an-toan-duoi) + 26px)}
+  .tieu-de{text-align:center;margin:0 0 4px;font-size:30px;letter-spacing:.18em;font-weight:800}
+  .phu-de{text-align:center;color:var(--chu-mo);font-size:13px;margin:0 0 26px;letter-spacing:.05em}
+  .the{width:100%;text-align:left;background:var(--nen2);border:1px solid var(--vien);
+    border-radius:10px;padding:16px;margin-bottom:12px;color:var(--chu);font:inherit;cursor:pointer;
+    display:flex;gap:14px;align-items:center;transition:border-color .15s,transform .1s}
+  .the:active{transform:scale(.985)}
+  .the[disabled]{opacity:.45;cursor:default}
+  .the:not([disabled]):hover{border-color:var(--nhan)}
+  .the .hinh{font-size:30px;width:48px;height:48px;display:grid;place-items:center;
+    background:#0c101a;border-radius:10px;flex:0 0 auto}
+  .the .ten{font-size:17px;font-weight:700;margin-bottom:3px;display:flex;align-items:center;gap:8px}
+  .the .mo{font-size:12.5px;color:var(--chu-mo);line-height:1.45;display:block}
+  .nhan-bo{font-size:10.5px;font-weight:700;letter-spacing:.08em;color:var(--nhan);
+    border:1px solid #4a3c14;background:#1d1708;border-radius:10px;padding:2px 7px}
+  .nhan-sap{font-size:10.5px;font-weight:700;color:var(--chu-mo);border:1px solid var(--vien);
+    border-radius:10px;padding:2px 7px}
+  .chan{text-align:center;color:#5b6479;font-size:11.5px;margin-top:22px;line-height:1.75}
+  .chan b{color:var(--chu-mo)}
+  .nut{width:100%;background:var(--nen2);border:1px solid var(--vien);color:var(--chu);
+    border-radius:10px;padding:13px 10px;font:inherit;font-weight:700;font-size:15px;cursor:pointer}
+  .nut:active{transform:scale(.97)}
+  .nut.chinh{background:var(--nhan);border-color:var(--nhan);color:#1a1405}
+  .nut.phu{background:transparent}
+
+  /* ========== GAME ========== */
+  #manGame{position:fixed;inset:0;background:#060b07}
+  #sanDau{position:absolute;inset:0;width:100%;height:100%;display:block}
+  #hud{position:absolute;left:0;right:0;top:0;padding:calc(var(--an-toan-tren) + 10px) 12px 0;
+    display:flex;gap:10px;align-items:flex-start;pointer-events:none}
+  .o-hud{background:rgba(10,12,18,.72);border:1px solid rgba(255,255,255,.09);border-radius:10px;
+    padding:7px 11px;backdrop-filter:blur(4px)}
+  #dongHo{font-size:22px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:.04em}
+  #dongHo.gap{color:var(--do)}
+  .nho{font-size:10px;color:var(--chu-mo);letter-spacing:.1em;margin-bottom:1px}
+  #aiLaSoi{font-size:19px;font-weight:800}
+  #banDoNho{width:116px;height:116px;border-radius:10px;border:1px solid rgba(255,255,255,.12);
+    background:rgba(6,13,8,.85);margin-left:auto;display:block}
+  #thanhSuc{position:absolute;left:14px;right:14px;bottom:calc(var(--an-toan-duoi) + 14px);
+    height:7px;border-radius:10px;background:rgba(255,255,255,.1);overflow:hidden;pointer-events:none}
+  #thanhSuc i{display:block;height:100%;width:100%;background:var(--lam);border-radius:10px}
+  #nutDung{position:absolute;right:12px;top:calc(var(--an-toan-tren) + 140px);width:42px;height:42px;
+    border-radius:10px;background:rgba(10,12,18,.72);border:1px solid rgba(255,255,255,.12);
+    color:var(--chu);font-size:15px;cursor:pointer}
+  #thongBao{position:absolute;left:0;right:0;top:34%;text-align:center;font-size:17px;font-weight:800;
+    letter-spacing:.06em;pointer-events:none;text-shadow:0 2px 14px #000;opacity:0;transition:opacity .3s}
+
+  /* ========== LỚP PHỦ ========== */
+  .lop-phu{position:absolute;inset:0;background:rgba(5,6,10,.93);display:grid;place-items:center;
+    padding:24px;z-index:5}
+  .hop{width:100%;max-width:340px;text-align:center}
+  .hop h2{margin:0 0 6px;font-size:26px;letter-spacing:.06em}
+  .hop p{margin:0 0 18px;color:var(--chu-mo);font-size:13.5px;line-height:1.6}
+  .bang{background:var(--nen2);border:1px solid var(--vien);border-radius:10px;padding:12px 14px;
+    margin-bottom:16px;font-size:13px}
+  .bang div{display:flex;justify-content:space-between;padding:4px 0;color:var(--chu-mo)}
+  .bang b{color:var(--chu);font-variant-numeric:tabular-nums}
+  .cot-nut{display:flex;flex-direction:column;gap:9px}
+</style>
+</head>
+<body>
+
+<section id="manMenu"></section>
+
+<section id="manGame" class="an">
+  <canvas id="sanDau"></canvas>
+  <div id="hud">
+    <div class="o-hud"><div class="nho">CÒN LẠI</div><div id="dongHo">1:30</div></div>
+    <div class="o-hud"><div class="nho">ĐANG LÀ SÓI</div><div id="aiLaSoi">—</div></div>
+    <canvas id="banDoNho" width="188" height="188"></canvas>
+  </div>
+  <button id="nutDung" aria-label="Tạm dừng">⏸</button>
+  <div id="thanhSuc"><i></i></div>
+  <div id="thongBao"></div>
+
+  <div id="lopDung" class="lop-phu an">
+    <div class="hop">
+      <h2>TẠM DỪNG</h2>
+      <p>Không ai đứng chờ bạn đâu.</p>
+      <div class="cot-nut">
+        <button class="nut chinh" id="nutTiepTuc">Tiếp tục</button>
+        <button class="nut phu" id="nutVeMenu1">Về menu</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="lopKetThuc" class="lop-phu an">
+    <div class="hop">
+      <h2 id="ketTieuDe">HẾT GIỜ</h2>
+      <p id="ketMoTa"></p>
+      <div class="bang" id="ketBang"></div>
+      <div class="cot-nut">
+        <button class="nut chinh" id="nutChoiLai">Chơi lại</button>
+        <button class="nut phu" id="nutVeMenu2">Về menu</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+'use strict';
+
+/* =====================================================================
+   TRÒ CHƠI BIÊN GIỚI — một file HTML, không thư viện ngoài
+   Game 1: ĐUỔI SÓI — 4 người, 3 cừu đuổi 1 sói, chạm được thì đổi vai.
+            Hết 1 phút 30, ai đang là sói thì thắng.
+   ===================================================================== */
+
+/* ---------------------------------------------------------------- ÂM THANH */
+var ctxAm = null, duongRa = null, amCamLang = null;
+var batAm = localStorage.getItem('tcbg-am') !== '0';
+
+/* file wav câm để iPhone giữ kênh âm thanh mở */
+function taoWavCam(giay){
+  var sr = 8000, n = Math.floor(sr * giay);
+  var b = new ArrayBuffer(44 + n * 2), d = new DataView(b);
+  function txt(o, s){ for (var i = 0; i < s.length; i++) d.setUint8(o + i, s.charCodeAt(i)); }
+  txt(0, 'RIFF'); d.setUint32(4, 36 + n * 2, true); txt(8, 'WAVE');
+  txt(12, 'fmt '); d.setUint32(16, 16, true); d.setUint16(20, 1, true); d.setUint16(22, 1, true);
+  d.setUint32(24, sr, true); d.setUint32(28, sr * 2, true); d.setUint16(32, 2, true); d.setUint16(34, 16, true);
+  txt(36, 'data'); d.setUint32(40, n * 2, true);
+  return URL.createObjectURL(new Blob([b], { type: 'audio/wav' }));
+}
+
+/* bù to tiếng cho loa điện thoại: compressor + gain */
+function taoDuongRa(){
+  var nen = ctxAm.createDynamicsCompressor();
+  nen.threshold.value = -20; nen.knee.value = 14; nen.ratio.value = 4;
+  nen.attack.value = 0.004; nen.release.value = 0.18;
+  var g = ctxAm.createGain(); g.gain.value = 1.2;
+  nen.connect(g); g.connect(ctxAm.destination);
+  return nen;
+}
+
+function moKhoaAmThanh(){
+  try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) {}
+  if (!ctxAm) {
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    ctxAm = new AC();
+    duongRa = taoDuongRa();
+  }
+  if (ctxAm.state === 'suspended') ctxAm.resume();
+  if (!amCamLang) {
+    try {
+      amCamLang = new Audio(taoWavCam(0.5));
+      amCamLang.loop = true; amCamLang.volume = 0.001;
+      amCamLang.play().catch(function(){});
+    } catch (e) {}
+  }
+}
+
+/* một nốt, tần số có thể trượt f -> f2 */
+function noi(o){
+  if (!batAm || !ctxAm) return;
+  var t0 = ctxAm.currentTime + (o.tre || 0);
+  var dai = o.dai || 0.14, am = (o.am === undefined ? 0.3 : o.am);
+  var os = ctxAm.createOscillator(), g = ctxAm.createGain();
+  os.type = o.loai || 'sine';
+  os.frequency.setValueAtTime(o.f, t0);
+  if (o.f2) os.frequency.exponentialRampToValueAtTime(Math.max(20, o.f2), t0 + dai);
+  g.gain.setValueAtTime(0.0001, t0);
+  g.gain.exponentialRampToValueAtTime(am, t0 + 0.012);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0 + dai);
+  os.connect(g); g.connect(duongRa);
+  os.start(t0); os.stop(t0 + dai + 0.02);
+}
+
+/* tiếng ồn: gầm, bước chân */
+function on(o){
+  if (!batAm || !ctxAm) return;
+  var t0 = ctxAm.currentTime + (o.tre || 0);
+  var dai = o.dai || 0.3, am = (o.am === undefined ? 0.25 : o.am);
+  var n = Math.floor(ctxAm.sampleRate * dai);
+  var bf = ctxAm.createBuffer(1, n, ctxAm.sampleRate), dl = bf.getChannelData(0);
+  for (var i = 0; i < n; i++) dl[i] = (Math.random() * 2 - 1) * (1 - i / n);
+  var src = ctxAm.createBufferSource(); src.buffer = bf;
+  var lp = ctxAm.createBiquadFilter(); lp.type = o.loai || 'lowpass';
+  lp.frequency.setValueAtTime(o.f || 900, t0);
+  if (o.f2) lp.frequency.exponentialRampToValueAtTime(Math.max(60, o.f2), t0 + dai);
+  lp.Q.value = o.q || 1;
+  var g = ctxAm.createGain();
+  g.gain.setValueAtTime(am, t0);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0 + dai);
+  src.connect(lp); lp.connect(g); g.connect(duongRa);
+  src.start(t0); src.stop(t0 + dai);
+}
+
+var AM = {
+  gam:     function(){ on({ f: 700, f2: 180, dai: 0.5, am: 0.28, q: 2 });
+                       noi({ f: 150, f2: 90, dai: 0.45, loai: 'sawtooth', am: 0.12 }); },
+  buoc:    function(){ on({ f: 1100, f2: 300, dai: 0.07, am: 0.06 }); },
+  timDap:  function(m){ noi({ f: 72, f2: 48, dai: 0.14, am: 0.1 + 0.3 * m });
+                        noi({ f: 60, f2: 42, dai: 0.1, am: 0.08 + 0.2 * m, tre: 0.17 }); },
+  /* bạn cướp được vai sói */
+  duocSoi: function(){ [392, 523, 659, 880].forEach(function(f, i){
+                         noi({ f: f, dai: 0.26, loai: 'triangle', am: 0.3, tre: i * 0.075 }); }); },
+  /* bạn bị cướp mất vai sói */
+  matSoi:  function(){ noi({ f: 440, f2: 160, dai: 0.5, loai: 'sawtooth', am: 0.22 });
+                       on({ f: 600, f2: 150, dai: 0.4, am: 0.18 }); },
+  /* hai con AI đổi vai cho nhau, nghe xa xa */
+  doiXa:   function(){ noi({ f: 330, f2: 250, dai: 0.2, loai: 'triangle', am: 0.1 }); },
+  tich:    function(cao){ noi({ f: cao ? 1320 : 880, dai: 0.09, loai: 'square', am: 0.2 }); },
+  thang:   function(){ [523, 659, 784, 1047, 1319].forEach(function(f, i){
+                         noi({ f: f, dai: 0.45, loai: 'triangle', am: 0.3, tre: i * 0.11 }); }); },
+  thua:    function(){ [392, 330, 262].forEach(function(f, i){
+                         noi({ f: f, dai: 0.55, loai: 'sawtooth', am: 0.22, tre: i * 0.17 }); }); }
+};
+
+/* ---------------------------------------------------------------- DỮ LIỆU */
+/* Giật Điểm mở trong một KHUNG đè lên trang menu thay vì chuyển trang: kênh chơi chung (window.claude) chỉ có ở trang
+   chính của artifact, game nằm trong khung thì với tới được qua parent.claude. Sau 4 giây khung không lên tiếng
+   ('gd-song') thì coi như bị chặn và chuyển trang như cũ (khi đó chỉ chơi một mình được). */
+function moKhung(trang){
+  var k = document.createElement('iframe'), song = false;
+  k.src = trang; k.id = 'khungGame'; k.setAttribute('allow', 'autoplay');
+  k.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;border:0;z-index:50;background:#0a0b10';
+  k.onload = function(){ try { k.contentWindow.focus(); } catch (e){} };
+  function nghe(ev){
+    if (ev.origin !== location.origin) return;
+    if (ev.data === 'gd-song') song = true;
+    if (ev.data === 'gd-dong'){ k.remove(); removeEventListener('message', nghe); }
+  }
+  addEventListener('message', nghe);
+  document.body.appendChild(k);
+  setTimeout(function(){ if (!song && k.parentNode){ k.remove(); removeEventListener('message', nghe); location.href = trang; } }, 4000);
+}
+var DS_GAME = [
+  { id: 'soi', ten: 'Đuổi Sói', hinh: '🐺', bo: 'BÍCH', co: true,
+    mo: '4 người trong mê cung: 3 cừu đuổi 1 sói. Chạm được sói thì bạn hóa sói, nó hóa cừu. Hết 1 phút 30, ai đang là sói thì thắng.' },
+  { id: 'thangmay', ten: 'Thang Máy 20 Tầng', hinh: '🛗', bo: 'RÔ', co: true, trang: 'thang-may.html',
+    mo: '8 người, mỗi vòng một câu đúng/sai. Sai một mình là bị loại. Lên tầng 20 là thoát.' },
+  { id: 'giatdiem', ten: 'Đuổi Bắt Giật Điểm', hinh: '🏃', bo: 'NHÉP', co: true, trang: 'giat-diem.html',
+    mo: '2 đội 5 đấu 5, chơi một mình hoặc tạo phòng chơi chung. Điểm của ai cũng ẩn, chạm nhau thì người nhiều điểm hơn giật 1. Chạm được trụ địch là thắng.' },
+  { id: 'zombie', ten: 'Zombie Lây Nhiễm', hinh: '🧟', bo: 'TIM', co: false,
+    mo: 'Bị chạm là thành zombie và đi lây người khác. Sống sót tới lúc trời sáng.' }
+];
+
+/* MỘT NÚM VẶN DUY NHẤT CHO TỐC ĐỘ CẢ BỐN NGƯỜI.
+   Thấy chậm thì tăng, thấy loạn thì giảm. 1.0 là bản đầu tiên, 1.3 là bản user thấy vừa. */
+var HE_SO_TOC = 1.3;
+function toc(v){ return Math.round(v * HE_SO_TOC); }
+/* Nhịp nghĩ của máy phải tính theo QUÃNG ĐƯỜNG, không theo đồng hồ: chạy nhanh hơn mà
+   vẫn 0,5 giây mới nghĩ lại một lần thì nó đi lố góc cua và đuổi vụng hẳn đi. */
+function nghi(v){ return Math.round(v / HE_SO_TOC * 100) / 100; }
+
+/* mức khó chỉ đổi NĂNG LỰC CỦA MÁY KHI LÀM CỪU, người chơi luôn như nhau */
+var CAP_DO = {
+  /* cừu máy chạy CHẬM HƠN người chơi (140) — máy thuộc đường còn người chơi phải tự mò,
+     cho người chơi hơn chân là để bù lại đúng chỗ đó. Riêng mức Khó thì gần ngang. */
+  de:     { ten: 'Dễ',     tocCuu: toc(122), nhoLai: nghi(0.80), hamChay: 0.30, hinh: '🌙' },
+  thuong: { ten: 'Thường', tocCuu: toc(130), nhoLai: nghi(0.50), hamChay: 0.60, hinh: '🐺' },
+  kho:    { ten: 'Khó',    tocCuu: toc(142), nhoLai: nghi(0.32), hamChay: 0.90, hinh: '💀' }
+};
+
+var NHAN_VAT = [
+  { ten: 'BẠN',  mau: '#f2efe4', nguoi: true },
+  { ten: 'ĐỎ',   mau: '#e0433c' },
+  { ten: 'XANH', mau: '#4a8fe0' },
+  { ten: 'LỤC',  mau: '#3fb97a' }
+];
+
+/* Vai sói là phần thưởng, nên nó phải có giá: ai đang là sói thì CHẬM HƠN mọi con cừu.
+   Nếu sói nhanh hơn thì không ai bắt được, cả ván không đổi vai lần nào — đã thử và hỏng đúng như vậy. */
+/* Sói đi bộ chỉ kém cừu người chơi một chút, không còn chậm nhất bàn — chậm hơn cả cừu máy
+   thì vào vai sói chỉ thấy ai cũng vượt mặt mình. Cú bứt hạ xuống ×1,95 để giữ tốc trung bình. */
+var TOC_SOI = toc(132);    /* tốc độ của bất kỳ ai đang làm sói, người hay máy */
+var TOC_NGUOI_CUU = toc(140); /* tốc độ người chơi khi là cừu */
+/* SÓI LÀ DÂN NƯỚC RÚT, CỪU LÀ DÂN CHẠY BỀN.
+   Sói đi bộ chậm nhất bàn (161) nhưng bứt tốc nhanh nhất bàn (330 > 309 của cừu) —
+   bù lại chỉ gồng được ~3 giây rồi phải thở 5 giây. Cừu ngược lại: bứt yếu hơn nhưng bền hơn.
+   Nhờ thế cả hai vai đều có việc để làm: sói canh lúc bứt để cắt đuôi, cừu ép lúc sói hết sức.
+   Hai lần hỏng trước: sói bứt mạnh mà vẫn bền → không ai bắt được; sói chậm hơn cả khi
+   chạy → vào vai sói thì bấm chạy cũng vô nghĩa, không có đường thoát. */
+var BUT_SOI = 1.95;
+var BUT_CUU = 1.70;
+var SUC_SOI_TON = 38, SUC_SOI_HOI = 20;
+var SUC_CUU_TON = 30, SUC_CUU_HOI = 19;
+var SUC_LAI = 25;              /* cạn sức thì phải hồi tới đây mới bứt lại được (~1,3 giây đi bộ) */
+var THOI_GIAN = 90;
+var GIAY_QUYET_LIET = 15;  /* 15 giây cuối máy đuổi hết sức */
+
+/* ---------------------------------------------------------------- KHUNG MÀN */
+var elMenu = document.getElementById('manMenu');
+var elGame = document.getElementById('manGame');
+
+function veMenuChinh(){
+  elMenu.innerHTML =
+    '<h1 class="tieu-de">BIÊN GIỚI</h1>' +
+    '<p class="phu-de">Bộ trò chơi sống sót &middot; chơi với máy</p>' +
+    '<div id="dsGame"></div>' +
+    '<p class="chan">Trò chơi tự dựng, lấy cảm hứng từ thể loại game sống sót.<br>' +
+    'Không liên quan tới bất kỳ tác phẩm thương mại nào.</p>';
+  var box = document.getElementById('dsGame');
+  DS_GAME.forEach(function(g){
+    var b = document.createElement('button');
+    b.className = 'the';
+    if (!g.co) b.disabled = true;
+    b.innerHTML =
+      '<span class="hinh">' + g.hinh + '</span>' +
+      '<span><span class="ten">' + g.ten +
+      '<span class="' + (g.co ? 'nhan-bo' : 'nhan-sap') + '">' + (g.co ? g.bo : 'SẮP CÓ') + '</span>' +
+      '</span><span class="mo">' + g.mo + '</span></span>';
+    if (g.co) b.onclick = function(){
+      moKhoaAmThanh();
+      if (g.trang){ if (g.id === 'giatdiem') moKhung(g.trang); else location.href = g.trang; }      /* game nằm ở file riêng */
+      else veManChonCap();
+    };
+    box.appendChild(b);
+  });
+}
+
+function veManChonCap(){
+  var thang = parseInt(localStorage.getItem('tcbg-soi-thang') || '0', 10);
+  var van = parseInt(localStorage.getItem('tcbg-soi-van') || '0', 10);
+  elMenu.innerHTML =
+    '<h1 class="tieu-de">ĐUỔI SÓI</h1>' +
+    '<p class="phu-de">Chọn mức khó của máy</p><div id="dsCap"></div>';
+  var box = document.getElementById('dsCap');
+  Object.keys(CAP_DO).forEach(function(k){
+    var c = CAP_DO[k];
+    var b = document.createElement('button');
+    b.className = 'the';
+    b.innerHTML = '<span class="hinh">' + c.hinh + '</span>' +
+      '<span><span class="ten">' + c.ten + '</span><span class="mo">' +
+      'máy làm cừu chạy ' + c.tocCuu + ' (sói luôn chậm: ' + TOC_SOI +
+      '), nghĩ lại đường mỗi ' + c.nhoLai + 's</span></span>';
+    b.onclick = function(){ moKhoaAmThanh(); Soi.batDau(k); };
+    box.appendChild(b);
+  });
+  var huong = document.createElement('p');
+  huong.className = 'chan';
+  huong.innerHTML =
+    '<b>Luật</b><br>Bốn người trong mê cung tối: một con <b>sói</b>, ba con <b>cừu</b>. ' +
+    'Cừu chạm được sói thì cừu đó <b>hóa thành sói</b>, con sói cũ hóa thành cừu. ' +
+    'Vừa đổi vai xong thì sói mới được miễn chạm 2 giây.<br>' +
+    '<b>Làm sói thì đi bộ chậm nhất bàn nhưng bứt tốc nhanh nhất bàn</b> — chỉ gồng được ' +
+    'khoảng 3 giây rồi phải thở. Cắt đuôi được hay không là nhờ bứt đúng lúc, ngay trước một góc cua.<br>' +
+    'Làm cừu thì ngược lại: bứt yếu hơn nhưng bền hơn — cứ ép đều, sói hết sức là tóm được.<br>' +
+    'Hết 1 phút 30 giây, <b>ai đang là sói thì người đó thắng</b>. Nên cuối giờ mới là lúc đáng sợ nhất.<br><br>' +
+    '<b>Điều khiển</b><br>Chạm và kéo ở bất kỳ đâu để đi, kéo hết tay là <b>chạy</b> (tốn sức, gây tiếng động). ' +
+    'Máy tính: WASD / mũi tên, giữ Shift để chạy, Esc tạm dừng.<br>' +
+    'Sói <b>phát sáng xuyên tường</b> và luôn hiện trên bản đồ nhỏ — không ai trốn được khi đang là sói.<br>' +
+    '<b>Mũi tên vàng</b> quanh người bạn luôn chỉ về phía sói kèm khoảng cách; khi bạn là sói thì ' +
+    'nó đổi thành mũi tên đỏ chỉ con cừu gần nhất. Bản đồ nhỏ hiện sẵn cả mê cung.' +
+    (van ? '<br><br>Đã chơi <b>' + van + '</b> ván, thắng <b>' + thang + '</b>.' : '');
+  box.appendChild(huong);
+  var ve = document.createElement('button');
+  ve.className = 'nut phu'; ve.textContent = '← Về danh sách'; ve.style.marginTop = '14px';
+  ve.onclick = veMenuChinh;
+  box.appendChild(ve);
+}
+
+function veMenu(){
+  Soi.dung();
+  elGame.classList.add('an');
+  elMenu.classList.remove('an');
+  veMenuChinh();
+}
+
+/* =====================================================================
+   GAME ĐUỔI SÓI
+   ===================================================================== */
+var Soi = (function(){
+
+  var O = 48;            /* một ô = 48px thế giới */
+  var CO = 21;           /* mê cung 21x21 ô — phải là số lẻ */
+  var MUC_THOANG = 0.70; /* tỉ lệ ô đi được: cao thì bản đồ thoáng, thấp thì rối.
+                            Trên 0.72 là sói chạy thẳng không ai bắt được — xem tài liệu. */
+  var MIEN_CHAM = 2.0;   /* sói mới được miễn chạm bao lâu */
+  var NGUOI = 0;         /* chỉ số của người chơi trong dsTT */
+
+  var sanDau = document.getElementById('sanDau');
+  var ctx = sanDau.getContext('2d');
+  var banDoNho = document.getElementById('banDoNho');
+  var ctxBD = banDoNho.getContext('2d');
+  var elDongHo = document.getElementById('dongHo');
+  var elAiSoi = document.getElementById('aiLaSoi');
+  var elSuc = document.querySelector('#thanhSuc i');
+  var elTB = document.getElementById('thongBao');
+  var lopDung = document.getElementById('lopDung');
+  var lopKet = document.getElementById('lopKetThuc');
+
+  var W = 0, H = 0, ti = 1, phong = 1;
+  var luoi, dsTT, soiHienTai, cap, capKey;
+  var conLai = 0, soLanDoi = 0, giayCuoi = -1;
+  var dangChay = false, tamDung = false, daXong = false;
+  var nhipTim = 0, hienTB = 0, chuoiTB = '', mauTB = '#fff', tgTruoc = 0;
+
+  /* ---------- nền: vẽ sẵn một lần ra canvas riêng ----------
+     Cả mê cung 1008×1008 được vẽ một lần lúc dựng ván rồi mỗi khung hình chỉ dán lại.
+     Nhờ thế mới dám vẽ từng cụm lá, từng nhánh cỏ mà không tụt khung hình. */
+  var nen = null;
+
+  /* số giả ngẫu nhiên cố định theo ô — cùng một ô thì lần nào cũng ra một giá trị,
+     để cỏ với lá không nhấp nháy mỗi khung hình */
+  function bam(x, y, k){
+    var s = Math.sin(x * 127.1 + y * 311.7 + (k || 0) * 74.7) * 43758.5453;
+    return s - Math.floor(s);
+  }
+
+  function veNen(){
+    nen = document.createElement('canvas');
+    nen.width = CO * O; nen.height = CO * O;
+    var c = nen.getContext('2d');
+    var x, y, i, px, py, t;
+
+    /* lượt 1: trải cỏ khắp nơi, kể cả dưới chân hàng rào */
+    for (y = 0; y < CO; y++) for (x = 0; x < CO; x++){
+      px = x * O; py = y * O; t = bam(x, y, 1);
+      c.fillStyle = 'hsl(' + Math.round(128 + t * 16) + ',24%,' + (10 + t * 3.5).toFixed(1) + '%)';
+      c.fillRect(px, py, O, O);
+      c.strokeStyle = 'rgba(132,198,142,.11)';
+      c.lineWidth = 1.3;
+      for (i = 0; i < 4; i++){
+        var gx = px + bam(x, y, i + 2) * O, gy = py + bam(x, y, i + 6) * O;
+        c.beginPath();
+        c.moveTo(gx, gy);
+        c.lineTo(gx + (bam(x, y, i + 10) - 0.5) * 6, gy - 3 - bam(x, y, i + 14) * 5);
+        c.stroke();
+      }
+      if (bam(x, y, 20) > 0.94){
+        c.fillStyle = 'rgba(226,226,178,.42)';
+        c.beginPath();
+        c.arc(px + bam(x, y, 21) * O, py + bam(x, y, 22) * O, 1.7, 0, 6.2832);
+        c.fill();
+      }
+    }
+
+    /* lượt 2: hàng rào cây — từng cụm lá tràn ra ngoài ô cho mép tự nhiên */
+    for (y = 0; y < CO; y++) for (x = 0; x < CO; x++){
+      if (luoi[y][x] !== 1) continue;
+      px = x * O; py = y * O;
+      c.fillStyle = '#10200e';
+      c.fillRect(px + 1, py + 1, O - 2, O - 2);
+      for (i = 0; i < 11; i++){
+        var l = bam(x, y, i + 30);
+        c.fillStyle = 'rgb(' + Math.round(26 + l * 34) + ',' + Math.round(58 + l * 56) + ',' + Math.round(30 + l * 28) + ')';
+        c.beginPath();
+        c.arc(px + 5 + bam(x, y, i + 42) * (O - 10), py + 5 + bam(x, y, i + 56) * (O - 10), 4.6 + l * 3.4, 0, 6.2832);
+        c.fill();
+      }
+    }
+
+    /* lượt 3: đỉnh rào hứng trăng, chân rào đổ bóng xuống cỏ */
+    for (y = 0; y < CO; y++) for (x = 0; x < CO; x++){
+      if (luoi[y][x] !== 1) continue;
+      px = x * O; py = y * O;
+      if (y > 0 && luoi[y - 1][x] === 0){
+        var s1 = c.createLinearGradient(0, py - 3, 0, py + 11);
+        s1.addColorStop(0, 'rgba(176,222,168,.30)');
+        s1.addColorStop(1, 'rgba(176,222,168,0)');
+        c.fillStyle = s1;
+        c.fillRect(px, py - 3, O, 14);
+      }
+      if (y < CO - 1 && luoi[y + 1][x] === 0){
+        var s2 = c.createLinearGradient(0, py + O, 0, py + O + 12);
+        s2.addColorStop(0, 'rgba(0,0,0,.5)');
+        s2.addColorStop(1, 'rgba(0,0,0,0)');
+        c.fillStyle = s2;
+        c.fillRect(px, py + O, O, 12);
+      }
+    }
+  }
+
+  /* ---------- tiện ích lưới ---------- */
+  function trong(x, y){ return x >= 0 && y >= 0 && x < CO && y < CO; }
+  function tuong(cx, cy){ return !trong(cx, cy) || luoi[cy][cx] === 1; }
+  function tamO(c){ return c * O + O / 2; }
+  function nguyenO(v){ return Math.floor(v / O); }
+  function ngauNhien(n){ return Math.floor(Math.random() * n); }
+  function oCua(e){ return [nguyenO(e.x), nguyenO(e.y)]; }
+
+  /* ---------- tạo mê cung bằng thuật toán đào lùi ---------- */
+  function taoMe(){
+    var o = [], y, x;
+    for (y = 0; y < CO; y++){ o.push([]); for (x = 0; x < CO; x++) o[y].push(1); }
+    var ngan = [[1, 1]];
+    o[1][1] = 0;
+    var huong = [[0, -2], [2, 0], [0, 2], [-2, 0]];
+    while (ngan.length){
+      var cur = ngan[ngan.length - 1], cx = cur[0], cy = cur[1], ds = [];
+      for (var i = 0; i < 4; i++){
+        var nx = cx + huong[i][0], ny = cy + huong[i][1];
+        if (nx > 0 && ny > 0 && nx < CO - 1 && ny < CO - 1 && o[ny][nx] === 1)
+          ds.push([nx, ny, cx + huong[i][0] / 2, cy + huong[i][1] / 2]);
+      }
+      if (!ds.length){ ngan.pop(); continue; }
+      var ch = ds[ngauNhien(ds.length)];
+      o[ch[3]][ch[2]] = 0;
+      o[ch[1]][ch[0]] = 0;
+      ngan.push([ch[0], ch[1]]);
+    }
+    /* Khoét tường cho tới khi đạt đúng MUC_THOANG — đuổi bắt mà toàn ngõ cụt thì chán.
+       Khoét theo danh sách tường đã xáo trộn, không bắn ngẫu nhiên, nên độ thoáng
+       ổn định giữa các ván và chỉnh bằng một con số duy nhất. */
+    var tuong = [], dangMo = 0;
+    for (y = 1; y < CO - 1; y++) for (x = 1; x < CO - 1; x++){
+      if (o[y][x] === 1) tuong.push(y * CO + x); else dangMo++;
+    }
+    for (var i = tuong.length - 1; i > 0; i--){
+      var j = ngauNhien(i + 1), tmp = tuong[i]; tuong[i] = tuong[j]; tuong[j] = tmp;
+    }
+    var canMo = Math.floor((CO - 2) * (CO - 2) * MUC_THOANG);
+    for (var k = 0; k < tuong.length && dangMo < canMo; k++){
+      var ox = tuong[k] % CO, oy = (tuong[k] - ox) / CO;
+      o[oy][ox] = 0; dangMo++;
+    }
+    return o;
+  }
+
+  /* ---------- BFS một nguồn: trả về đường đi theo ô ---------- */
+  function timDuong(ax, ay, bx, by){
+    if (tuong(ax, ay) || tuong(bx, by)) return null;
+    if (ax === bx && ay === by) return [[bx, by]];
+    var tu = new Int32Array(CO * CO).fill(-2);
+    var hd = [ay * CO + ax], dau = 0, dich = by * CO + bx;
+    tu[ay * CO + ax] = -1;
+    while (dau < hd.length){
+      var o = hd[dau++];
+      if (o === dich) break;
+      var x = o % CO, y = (o - x) / CO;
+      var nx4 = [x + 1, x - 1, x, x], ny4 = [y, y, y + 1, y - 1];
+      for (var i = 0; i < 4; i++){
+        var nx = nx4[i], ny = ny4[i];
+        if (tuong(nx, ny)) continue;
+        var ni = ny * CO + nx;
+        if (tu[ni] !== -2) continue;
+        tu[ni] = o;
+        hd.push(ni);
+      }
+    }
+    if (tu[dich] === -2) return null;
+    var duong = [], cur = dich;
+    while (cur !== -1){ duong.push([cur % CO, Math.floor(cur / CO)]); cur = tu[cur]; }
+    duong.reverse();
+    return duong;
+  }
+
+  /* ---------- BFS đa nguồn: khoảng cách (tính theo ô) tới đám cừu ---------- */
+  function khoangCachTu(dsO){
+    var kc = new Int16Array(CO * CO).fill(-1);
+    var hd = [], dau = 0;
+    for (var i = 0; i < dsO.length; i++){
+      var x = dsO[i][0], y = dsO[i][1];
+      if (tuong(x, y)) continue;
+      var id = y * CO + x;
+      if (kc[id] >= 0) continue;
+      kc[id] = 0; hd.push(id);
+    }
+    while (dau < hd.length){
+      var o = hd[dau++], ox = o % CO, oy = (o - ox) / CO;
+      var nx4 = [ox + 1, ox - 1, ox, ox], ny4 = [oy, oy, oy + 1, oy - 1];
+      for (var k = 0; k < 4; k++){
+        var nx = nx4[k], ny = ny4[k];
+        if (tuong(nx, ny)) continue;
+        var ni = ny * CO + nx;
+        if (kc[ni] >= 0) continue;
+        kc[ni] = kc[o] + 1;
+        hd.push(ni);
+      }
+    }
+    return kc;
+  }
+
+  /* ---------- sói chọn ô để chạy trốn: xa cừu nhất trong tầm 10 ô ---------- */
+  function oChayTron(sx, sy, kcCuu){
+    var tham = new Int16Array(CO * CO).fill(-1);
+    var hd = [sy * CO + sx], dau = 0;
+    tham[sy * CO + sx] = 0;
+    var tot = [sx, sy], diemTot = -1e9;
+    while (dau < hd.length){
+      var o = hd[dau++], ox = o % CO, oy = (o - ox) / CO, buoc = tham[o];
+      if (kcCuu[o] >= 0){
+        /* càng xa cừu càng tốt, nhưng đi quá xa thì mất thời gian */
+        var diem = kcCuu[o] - buoc * 0.34;
+        if (diem > diemTot){ diemTot = diem; tot = [ox, oy]; }
+      }
+      if (buoc >= 10) continue;
+      var nx4 = [ox + 1, ox - 1, ox, ox], ny4 = [oy, oy, oy + 1, oy - 1];
+      for (var k = 0; k < 4; k++){
+        var nx = nx4[k], ny = ny4[k];
+        if (tuong(nx, ny)) continue;
+        var ni = ny * CO + nx;
+        if (tham[ni] >= 0) continue;
+        tham[ni] = buoc + 1;
+        hd.push(ni);
+      }
+    }
+    return tot;
+  }
+
+  /* ---------- đường ngắm ---------- */
+  function thayDuoc(ax, ay, bx, by){
+    var d = Math.hypot(bx - ax, by - ay), b = Math.ceil(d / 10);
+    for (var i = 1; i < b; i++){
+      var t = i / b;
+      if (tuong(nguyenO(ax + (bx - ax) * t), nguyenO(ay + (by - ay) * t))) return false;
+    }
+    return true;
+  }
+
+  /* ---------- va chạm thân tròn với tường ---------- */
+  var GOC = [[-1, -1], [1, -1], [-1, 1], [1, 1], [0, 0]];
+  function chamTuong(x, y, r){
+    for (var i = 0; i < GOC.length; i++){
+      if (tuong(nguyenO(x + GOC[i][0] * r), nguyenO(y + GOC[i][1] * r))) return true;
+    }
+    return false;
+  }
+  function dayDi(e, dx, dy){
+    if (dx){ e.x += dx; if (chamTuong(e.x, e.y, e.r)) e.x -= dx; }
+    if (dy){ e.y += dy; if (chamTuong(e.x, e.y, e.r)) e.y -= dy; }
+  }
+
+  function oTrongXa(dsDiem, toiThieu){
+    var tot = [1, 1], totNhat = -1;
+    for (var lan = 0; lan < 500; lan++){
+      var x = 1 + ngauNhien(CO - 2), y = 1 + ngauNhien(CO - 2);
+      if (tuong(x, y)) continue;
+      var gan = 1e9;
+      for (var i = 0; i < dsDiem.length; i++){
+        var d = Math.abs(dsDiem[i][0] - x) + Math.abs(dsDiem[i][1] - y);
+        if (d < gan) gan = d;
+      }
+      if (gan > totNhat){ totNhat = gan; tot = [x, y]; }
+      if (gan >= toiThieu) return [x, y];
+    }
+    return tot;
+  }
+
+  /* ---------- dựng một ván mới ---------- */
+  function dungVan(){
+    luoi = taoMe();
+    veNen();
+    dsTT = [];
+    var daDung = [];
+    for (var i = 0; i < NHAN_VAT.length; i++){
+      var o = oTrongXa(daDung.length ? daDung : [[1, 1]], 7);
+      daDung.push(o);
+      dsTT.push({
+        chiSo: i, ten: NHAN_VAT[i].ten, mau: NHAN_VAT[i].mau, laNguoi: !!NHAN_VAT[i].nguoi,
+        x: tamO(o[0]), y: tamO(o[1]), r: 14,
+        suc: 100, kiet: false, dangChay: false, huong: 0, duongBuoc: 0,
+        duong: null, buoc: 0, dichDaTinh: null, hetHan: 0, muonChay: false,
+        mien: 0, tgLamSoi: 0
+      });
+    }
+    soiHienTai = ngauNhien(dsTT.length);
+    dsTT[soiHienTai].mien = MIEN_CHAM;
+
+    conLai = THOI_GIAN;
+    soLanDoi = 0; giayCuoi = -1;
+    daXong = false; tamDung = false; nhipTim = 0; hienTB = 0;
+    lopDung.classList.add('an');
+    lopKet.classList.add('an');
+    elTB.style.opacity = '0';
+    noiTB(soiHienTai === NGUOI ? 'BẠN LÀ SÓI — CHẠY ĐI' : 'SÓI LÀ ' + dsTT[soiHienTai].ten + ' — ĐUỔI THEO',
+          2.4, soiHienTai === NGUOI ? '#e4b94a' : '#fff');
+    capNhatHUD();
+  }
+
+  /* ---------- cỡ canvas ---------- */
+  function doLaiCo(){
+    ti = Math.min(window.devicePixelRatio || 1, 2.5);
+    W = sanDau.clientWidth || window.innerWidth;
+    H = sanDau.clientHeight || window.innerHeight;
+    sanDau.width = Math.round(W * ti);
+    sanDau.height = Math.round(H * ti);
+    ctx.setTransform(ti, 0, 0, ti, 0, 0);
+    /* kéo gần vào cho thấy rõ hình con cừu con sói — tầm nhìn vốn đã bị bóng tối
+       giới hạn ở khoảng 5,5 ô rồi nên kéo gần không làm mất thông tin gì */
+    phong = Math.max(0.75, Math.min(2.0, Math.min(W, H) / (6.9 * O)));
+  }
+
+  /* ---------- điều khiển ---------- */
+  var joy = { bam: false, id: null, ox: 0, oy: 0, x: 0, y: 0, manh: 0, gx: 0, gy: 0 };
+  var BK_JOY = 62;
+  var phim = {};
+
+  sanDau.addEventListener('pointerdown', function(e){
+    if (tamDung || daXong || joy.bam) return;
+    joy.bam = true; joy.id = e.pointerId;
+    joy.ox = joy.x = e.clientX;
+    joy.oy = joy.y = e.clientY;
+    joy.manh = 0; joy.gx = 0; joy.gy = 0;
+  });
+  sanDau.addEventListener('pointermove', function(e){
+    if (!joy.bam || e.pointerId !== joy.id) return;
+    var dx = e.clientX - joy.ox, dy = e.clientY - joy.oy, d = Math.hypot(dx, dy);
+    if (d > BK_JOY){ dx *= BK_JOY / d; dy *= BK_JOY / d; d = BK_JOY; }
+    joy.x = joy.ox + dx; joy.y = joy.oy + dy;
+    joy.manh = d / BK_JOY;
+    if (d > 1){ joy.gx = dx / d; joy.gy = dy / d; }
+  });
+  function joyLen(e){
+    if (e.pointerId !== joy.id) return;
+    joy.bam = false; joy.id = null; joy.manh = 0; joy.gx = 0; joy.gy = 0;
+  }
+  sanDau.addEventListener('pointerup', joyLen);
+  sanDau.addEventListener('pointercancel', joyLen);
+
+  window.addEventListener('keydown', function(e){
+    phim[e.key.toLowerCase()] = true;
+    if (e.key === ' ' || e.key.indexOf('Arrow') === 0) e.preventDefault();
+    if (e.key === 'Escape' && dangChay && !daXong) datTamDung(!tamDung);
+  });
+  window.addEventListener('keyup', function(e){ phim[e.key.toLowerCase()] = false; });
+
+  function vectoPhim(){
+    var x = 0, y = 0;
+    if (phim['a'] || phim['arrowleft']) x -= 1;
+    if (phim['d'] || phim['arrowright']) x += 1;
+    if (phim['w'] || phim['arrowup']) y -= 1;
+    if (phim['s'] || phim['arrowdown']) y += 1;
+    var d = Math.hypot(x, y);
+    if (d){ x /= d; y /= d; }
+    return { x: x, y: y, co: d > 0, chay: !!phim['shift'] };
+  }
+
+  function noiTB(s, giay, mau){ chuoiTB = s; hienTB = giay || 1.6; mauTB = mau || '#fff'; }
+
+  /* ---------- di chuyển chung cho người và máy ---------- */
+  function diTheoHuong(e, gx, gy, manh, muonChay, tocCoBan, dt){
+    var laSoi = e.chiSo === soiHienTai;
+    /* Sửa 17/11/2026: trước là `e.suc > 6` — cạn sức mà vẫn giữ nút chạy thì vừa hồi được 6 đã bứt, vừa bứt
+       đã tụt, tốc độ (và cả vòng sáng) đổi mỗi vài khung hình → giật. Giờ: KIỆT thì đi bộ tới khi hồi được SUC_LAI.
+       Máy không bị ảnh hưởng vì nó tự ngừng xin chạy từ mức 10 trở lên, không bao giờ chạm 1. */
+    if (e.suc <= 1) e.kiet = true; else if (e.suc >= SUC_LAI) e.kiet = false;
+    e.dangChay = muonChay && !e.kiet && manh > 0.1;
+    if (e.dangChay) e.suc = Math.max(0, e.suc - (laSoi ? SUC_SOI_TON : SUC_CUU_TON) * dt);
+    else e.suc = Math.min(100, e.suc + (laSoi ? SUC_SOI_HOI : SUC_CUU_HOI) * dt);
+
+    if (manh <= 0.02) return;
+    var but = laSoi ? BUT_SOI : BUT_CUU;
+    /* Đạt tốc tối đa từ khi kéo 45%, không phải 86%. Trước đây 86% vừa là mốc đạt tốc tối đa
+       vừa là ngưỡng chạy nên không có khoảng nào để đi bộ tử tế: kéo 60% chỉ đi được 127,
+       chậm hơn cả cừu máy (169) — user kêu "tốc độ của t chậm hơn máy" là đúng. */
+    var heSo = Math.max(0, Math.min(1, (manh - 0.12) / 0.33));
+    var toc = (e.dangChay ? tocCoBan * but : tocCoBan) * heSo;
+    e.huong = Math.atan2(gy, gx);
+    dayDi(e, gx * toc * dt, gy * toc * dt);
+    if (e.dangChay){
+      e.duongBuoc += toc * dt;
+      if (e.duongBuoc > 95){
+        e.duongBuoc = 0;
+        if (e.laNguoi) AM.buoc();
+      }
+    }
+  }
+
+  function tocCoBanCua(e){
+    if (e.chiSo === soiHienTai) return TOC_SOI;
+    return e.laNguoi ? TOC_NGUOI_CUU : cap.tocCuu;
+  }
+
+  /* ---------- người chơi ---------- */
+  function dieuKhienNguoi(e, dt){
+    var vp = vectoPhim();
+    var gx = 0, gy = 0, manh = 0, muonChay = false;
+    if (joy.bam && joy.manh > 0.12){
+      gx = joy.gx; gy = joy.gy; manh = joy.manh; muonChay = joy.manh > 0.86;
+    } else if (vp.co){
+      gx = vp.x; gy = vp.y; manh = 1; muonChay = vp.chay;
+    }
+    diTheoHuong(e, gx, gy, manh, muonChay, tocCoBanCua(e), dt);
+
+  }
+
+  /* ---------- máy ---------- */
+  function dieuKhienMay(e, dt){
+    var laSoi = e.chiSo === soiHienTai;
+    var soi = dsTT[soiHienTai];
+    e.hetHan -= dt;
+
+    if (e.hetHan <= 0 || !e.duong || e.buoc >= e.duong.length){
+      var dich;
+      if (laSoi){
+        var dsCuu = [];
+        for (var i = 0; i < dsTT.length; i++) if (i !== soiHienTai) dsCuu.push(oCua(dsTT[i]));
+        dich = oChayTron(nguyenO(e.x), nguyenO(e.y), khoangCachTu(dsCuu));
+      } else {
+        dich = oCua(soi);
+        /* Hai con chặn đầu, một con bám đuôi. Bản đồ càng thoáng thì bám đuôi càng vô dụng:
+           sói bứt tốc nhanh hơn cừu nên chạy thẳng là không ai đuổi kịp — chỉ có cắt mặt
+           mới bắt được. Chặn càng xa khi sói còn ở xa, gần lại thì rút ngắn kẻo hụt. */
+        if (e.chiSo >= 2){
+          var oXa = Math.hypot(soi.x - e.x, soi.y - e.y) / O;
+          var truoc = Math.max(2, Math.min(7, Math.round(oXa * 0.6)));
+          if (e.chiSo === 2) truoc = Math.max(2, truoc - 2);
+          for (; truoc >= 2; truoc--){
+            var cx2 = dich[0] + Math.round(Math.cos(soi.huong) * truoc);
+            var cy2 = dich[1] + Math.round(Math.sin(soi.huong) * truoc);
+            if (!tuong(cx2, cy2)){ dich = [cx2, cy2]; break; }
+          }
+        }
+      }
+      e.duong = timDuong(nguyenO(e.x), nguyenO(e.y), dich[0], dich[1]);
+      e.buoc = (e.duong && e.duong.length > 1) ? 1 : 0;
+      e.hetHan = cap.nhoLai;
+
+      /* quyết định có chạy nước rút không — sói tính theo con cừu gần nhất, cừu tính theo sói */
+      var kc;
+      if (laSoi){
+        kc = 1e9;
+        for (var j = 0; j < dsTT.length; j++){
+          if (j === soiHienTai) continue;
+          var dj = Math.hypot(dsTT[j].x - e.x, dsTT[j].y - e.y);
+          if (dj < kc) kc = dj;
+        }
+        e.muonChay = e.suc > 18 && kc < 230;
+      } else {
+        kc = Math.hypot(soi.x - e.x, soi.y - e.y);
+        if (conLai <= GIAY_QUYET_LIET) e.muonChay = e.suc > 10;      /* cuối giờ thì bất chấp */
+        /* Sói bứt tốc thì bám theo — nhưng chỉ khi còn gần đầy sức. Bản đồ thoáng không có
+           góc cua để gỡ lại khoảng cách, hở một nhịp bứt tốc là mất đứt. Ngưỡng 55 sức làm
+           cừu chỉ đuổi theo được nhịp bứt đầu; nhịp thứ hai liền sau đó thì sói thoát. */
+        else if (soi.dangChay && kc < 330) e.muonChay = e.suc > 55;
+        else e.muonChay = e.suc > 35 && kc < 260 && Math.random() < cap.hamChay;
+      }
+    }
+
+    if (e.duong && e.buoc < e.duong.length){
+      var o = e.duong[e.buoc];
+      var tx = tamO(o[0]), ty = tamO(o[1]);
+      var ddx = tx - e.x, ddy = ty - e.y, dd = Math.hypot(ddx, ddy);
+      if (dd < 5){ e.buoc++; return; }
+      diTheoHuong(e, ddx / dd, ddy / dd, 1, e.muonChay, tocCoBanCua(e), dt);
+    } else {
+      diTheoHuong(e, 0, 0, 0, false, tocCoBanCua(e), dt);
+    }
+  }
+
+  /* ---------- đổi vai khi cừu chạm được sói ---------- */
+  function kiemTraCham(){
+    var soi = dsTT[soiHienTai];
+    if (soi.mien > 0) return;
+    for (var i = 0; i < dsTT.length; i++){
+      if (i === soiHienTai) continue;
+      var c = dsTT[i];
+      if (Math.hypot(c.x - soi.x, c.y - soi.y) > c.r + soi.r - 2) continue;
+
+      /* cừu i hóa sói, sói cũ hóa cừu */
+      var cu = soiHienTai;
+      soiHienTai = i;
+      soLanDoi++;
+      c.mien = MIEN_CHAM;
+      c.duong = null; c.hetHan = 0;
+      soi.duong = null; soi.hetHan = 0;
+
+      /* đẩy con vừa mất vai ra sau một chút cho khỏi dính nhau */
+      var gx = soi.x - c.x, gy = soi.y - c.y, g = Math.hypot(gx, gy) || 1;
+      dayDi(soi, (gx / g) * 26, (gy / g) * 26);
+
+      if (i === NGUOI){
+        AM.duocSoi();
+        noiTB('BẠN LÀ SÓI — CHẠY ĐI', 1.8, '#e4b94a');
+      } else if (cu === NGUOI){
+        AM.matSoi();
+        noiTB(c.ten + ' CƯỚP MẤT — ĐUỔI THEO', 1.8, '#e0433c');
+      } else {
+        AM.doiXa();
+        noiTB(c.ten + ' ĐÃ THÀNH SÓI', 1.2, c.mau);
+      }
+      capNhatHUD();
+      return;
+    }
+  }
+
+  /* ---------- nhịp tim: theo khoảng cách giữa bạn và sói ---------- */
+  function capNhatNhipTim(dt){
+    var toi = dsTT[NGUOI], soi = dsTT[soiHienTai];
+    var gan = (soiHienTai === NGUOI) ? 1e9 : Math.hypot(soi.x - toi.x, soi.y - toi.y);
+    if (soiHienTai === NGUOI){
+      /* là sói thì nghe nhịp tim theo con cừu gần nhất */
+      for (var i = 0; i < dsTT.length; i++){
+        if (i === NGUOI) continue;
+        var d = Math.hypot(dsTT[i].x - toi.x, dsTT[i].y - toi.y);
+        if (d < gan) gan = d;
+      }
+    }
+    if (gan > 460){ nhipTim = 0; return gan; }
+    var m = 1 - gan / 460;
+    nhipTim -= dt;
+    if (nhipTim <= 0){
+      nhipTim = 1.15 - 0.8 * m;
+      AM.timDap(m);
+    }
+    return gan;
+  }
+
+  /* ---------- HUD ---------- */
+  function capNhatHUD(){
+    var p = Math.max(0, Math.floor(conLai / 60)), g = Math.max(0, Math.floor(conLai % 60));
+    elDongHo.textContent = p + ':' + String(g).padStart(2, '0');
+    elDongHo.classList.toggle('gap', conLai <= 20);
+    elAiSoi.textContent = dsTT[soiHienTai].ten;
+    elAiSoi.style.color = dsTT[soiHienTai].mau;
+    elSuc.style.width = dsTT[NGUOI].suc + '%';
+    elSuc.style.background = dsTT[NGUOI].kiet ? '#6b7385' : dsTT[NGUOI].suc < 20 ? 'var(--do)'
+                           : dsTT[NGUOI].suc < 50 ? 'var(--nhan)' : 'var(--lam)';
+  }
+
+  /* ---------- VẼ ---------- */
+  /* ---------- hình nhân vật ----------
+     Nhìn từ trên xuống, quay theo hướng đang đi. Bộ lông/bộ lốt vẽ bằng nhiều hình tròn
+     chồng nhau nên viền mới xù xì tự nhiên. Màu của từng người được pha vào lông chứ
+     không tô đè, để vẫn ra con cừu mà vẫn phân biệt được ai với ai. */
+  var CUM_LONG = [[-8, 0, 8], [-4, -6, 7], [-4, 6, 7], [1, -5, 8], [1, 5, 8], [4, 0, 8.5], [-1, 0, 9]];
+
+  function veCumLong(no, mau){
+    ctx.fillStyle = mau;
+    for (var i = 0; i < CUM_LONG.length; i++){
+      ctx.beginPath();
+      ctx.arc(CUM_LONG[i][0], CUM_LONG[i][1], CUM_LONG[i][2] + no, 0, 6.2832);
+      ctx.fill();
+    }
+  }
+
+  function veBongDo(){
+    ctx.fillStyle = 'rgba(0,0,0,.4)';
+    ctx.beginPath();
+    ctx.ellipse(1, 4, 14, 10, 0, 0, 6.2832);
+    ctx.fill();
+  }
+
+  function veChan(mau){
+    ctx.fillStyle = mau;
+    var ds = [[-5, -7.5], [-5, 7.5], [6, -7], [6, 7]];
+    for (var i = 0; i < ds.length; i++){
+      ctx.beginPath();
+      ctx.ellipse(ds[i][0], ds[i][1], 2.8, 3.4, 0, 0, 6.2832);
+      ctx.fill();
+    }
+  }
+
+  function veCuu(e){
+    veChan('#43392f');
+    veCumLong(1.6, 'rgba(0,0,0,.5)');          /* viền ngoài cho nổi trên cỏ */
+    veCumLong(0, '#f3efe3');                   /* lông trắng ngà */
+    ctx.globalAlpha = 0.24;
+    veCumLong(0, e.mau);                       /* pha màu nhận dạng vào lông */
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = 'rgba(255,255,255,.5)';    /* đốm sáng phía trước */
+    ctx.beginPath(); ctx.arc(2, -3, 4.5, 0, 6.2832); ctx.fill();
+
+    ctx.strokeStyle = e.mau;                   /* vòng cổ màu */
+    ctx.lineWidth = 2.6;
+    ctx.beginPath(); ctx.arc(7.5, 0, 5.6, -1.25, 1.25); ctx.stroke();
+
+    ctx.fillStyle = '#322c27';                 /* tai */
+    ctx.beginPath(); ctx.ellipse(10.5, -5.4, 3.4, 2.1, -0.7, 0, 6.2832); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(10.5, 5.4, 3.4, 2.1, 0.7, 0, 6.2832); ctx.fill();
+    ctx.fillStyle = '#3c352e';                 /* đầu */
+    ctx.beginPath(); ctx.ellipse(12.5, 0, 5.8, 4.7, 0, 0, 6.2832); ctx.fill();
+    ctx.fillStyle = '#f7f4ea';                 /* mắt */
+    ctx.beginPath(); ctx.arc(14.6, -2.1, 1.25, 0, 6.2832); ctx.fill();
+    ctx.beginPath(); ctx.arc(14.6, 2.1, 1.25, 0, 6.2832); ctx.fill();
+    ctx.fillStyle = '#1d1a16';
+    ctx.beginPath(); ctx.arc(15.1, -2.1, 0.6, 0, 6.2832); ctx.fill();
+    ctx.beginPath(); ctx.arc(15.1, 2.1, 0.6, 0, 6.2832); ctx.fill();
+  }
+
+  function veSoi(e){
+    ctx.fillStyle = '#23241f';                 /* đuôi xù */
+    ctx.beginPath();
+    ctx.moveTo(-9, -4);
+    ctx.quadraticCurveTo(-20, -9, -23, 1);
+    ctx.quadraticCurveTo(-19, 7, -9, 4);
+    ctx.closePath();
+    ctx.fill();
+
+    veChan('#1b1c18');
+
+    ctx.fillStyle = '#2d2f28';                 /* mình */
+    ctx.beginPath(); ctx.ellipse(-1, 0, 13.5, 9.2, 0, 0, 6.2832); ctx.fill();
+    ctx.globalAlpha = 0.38;                    /* pha màu nhận dạng */
+    ctx.fillStyle = e.mau;
+    ctx.beginPath(); ctx.ellipse(-1, 0, 13.5, 9.2, 0, 0, 6.2832); ctx.fill();
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = 'rgba(255,255,255,.14)';   /* sống lưng bắt sáng */
+    ctx.beginPath(); ctx.ellipse(-1, -3, 10, 3.4, 0, 0, 6.2832); ctx.fill();
+
+    ctx.fillStyle = '#21231d';                 /* tai nhọn */
+    ctx.beginPath(); ctx.moveTo(6, -7); ctx.lineTo(11.5, -11.5); ctx.lineTo(12.5, -5); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(6, 7); ctx.lineTo(11.5, 11.5); ctx.lineTo(12.5, 5); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#34362d';                 /* đầu */
+    ctx.beginPath(); ctx.ellipse(11, 0, 7.4, 6.2, 0, 0, 6.2832); ctx.fill();
+    ctx.fillStyle = '#272921';                 /* mõm */
+    ctx.beginPath(); ctx.moveTo(14, -3.6); ctx.lineTo(14, 3.6); ctx.lineTo(21.5, 0); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#0e0f0c';
+    ctx.beginPath(); ctx.arc(20.6, 0, 1.5, 0, 6.2832); ctx.fill();
+
+    ctx.shadowColor = 'rgba(255,214,90,.95)';  /* mắt sáng */
+    ctx.shadowBlur = 10;
+    ctx.fillStyle = '#ffd65a';
+    ctx.beginPath(); ctx.ellipse(13, -3, 1.9, 1.3, -0.3, 0, 6.2832); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(13, 3, 1.9, 1.3, 0.3, 0, 6.2832); ctx.fill();
+    ctx.shadowBlur = 0;
+  }
+
+  function veMotNguoi(e, laSoi){
+    ctx.save();
+    ctx.translate(e.x, e.y);
+    /* vẽ to hơn thân thật một chút cho nhìn rõ mặt mũi; vùng va chạm vẫn là r = 14 */
+    ctx.scale(1.25, 1.25);
+    if (laSoi && e.mien > 0) ctx.globalAlpha = 0.45 + 0.55 * Math.abs(Math.sin(Date.now() / 90));
+    veBongDo();
+    if (laSoi){
+      ctx.shadowColor = 'rgba(228,185,74,.85)';   /* hào quang vàng: sói là phần thưởng */
+      ctx.shadowBlur = 26;
+      ctx.fillStyle = 'rgba(228,185,74,.22)';
+      ctx.beginPath(); ctx.arc(0, 0, 17, 0, 6.2832); ctx.fill();
+      ctx.shadowBlur = 0;
+    }
+    ctx.rotate(e.huong);
+    if (laSoi) veSoi(e); else veCuu(e);
+    ctx.restore();
+
+    /* vệt gió khi đang chạy nước rút */
+    if (e.dangChay){
+      ctx.save();
+      ctx.translate(e.x, e.y);
+      ctx.rotate(e.huong);
+      ctx.strokeStyle = 'rgba(255,255,255,.22)';
+      ctx.lineWidth = 1.5;
+      for (var v = 0; v < 2; v++){
+        var oy = (v - 0.5) * 11;
+        ctx.beginPath();
+        ctx.moveTo(-23, oy);
+        ctx.lineTo(-32 - v * 3, oy);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    /* tên của ba con do máy điều khiển */
+    if (!e.laNguoi){
+      ctx.save();
+      ctx.font = 'bold 10px system-ui';
+      ctx.textAlign = 'center';
+      ctx.shadowColor = '#000'; ctx.shadowBlur = 5;
+      ctx.fillStyle = e.mau;
+      ctx.fillText(e.ten, e.x, e.y - 24);
+      ctx.restore();
+    }
+  }
+
+  /* mũi tên bám quanh người chơi, kèm khoảng cách tính theo ô */
+  function veMuiTen(toi, muc, mau, nhan){
+    var dx = muc.x - toi.x, dy = muc.y - toi.y;
+    var d = Math.hypot(dx, dy);
+    if (d < 130) return;                       /* sát rồi thì khỏi chỉ */
+    var goc = Math.atan2(dy, dx);
+    var bk = Math.min(W, H) * 0.3;
+    var px = W / 2 + Math.cos(goc) * bk, py = H / 2 + Math.sin(goc) * bk;
+    ctx.save();
+    ctx.translate(px, py);
+    ctx.rotate(goc);
+    ctx.globalAlpha = 0.9;
+    ctx.shadowColor = mau; ctx.shadowBlur = 14;
+    ctx.fillStyle = mau;
+    ctx.beginPath();
+    ctx.moveTo(15, 0); ctx.lineTo(-8, 8); ctx.lineTo(-4, 0); ctx.lineTo(-8, -8);
+    ctx.closePath(); ctx.fill();
+    ctx.restore();
+    ctx.save();
+    ctx.translate(px, py);
+    ctx.font = 'bold 11px system-ui';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = mau;
+    ctx.shadowColor = '#000'; ctx.shadowBlur = 6;
+    ctx.fillText(nhan + ' ' + Math.round(d / O) + ' ô', 0, 24);
+    ctx.restore();
+  }
+
+  function ve(gan){
+    var toi = dsTT[NGUOI];
+    var cx = W / 2 - toi.x * phong, cy = H / 2 - toi.y * phong;
+    ctx.fillStyle = '#060b07';
+    ctx.fillRect(0, 0, W, H);
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.scale(phong, phong);
+
+    ctx.drawImage(nen, 0, 0);
+
+    /* các nhân vật khác: cừu phải nhìn thấy mới vẽ, sói thì phát sáng xuyên tường */
+    for (var i = 0; i < dsTT.length; i++){
+      if (i === NGUOI) continue;
+      var e = dsTT[i];
+      var laSoi = (i === soiHienTai);
+      var d = Math.hypot(e.x - toi.x, e.y - toi.y);
+      if (laSoi){
+        if (d > 520) continue;
+      } else {
+        if (d > 330 || !thayDuoc(toi.x, toi.y, e.x, e.y)) continue;
+      }
+      veMotNguoi(e, laSoi);
+    }
+    veMotNguoi(toi, soiHienTai === NGUOI);
+
+    ctx.restore();
+
+    /* bóng tối: nhân màn hình với gradient quanh người chơi */
+    var mx = W / 2, my = H / 2;
+    var bk = (toi.dangChay ? 300 : 265) * phong;
+    var g = ctx.createRadialGradient(mx, my, 40 * phong, mx, my, bk);
+    /* multiply: phải đổi ĐỘ SÁNG của màu, không phải alpha — alpha thấp thì gần như không tối đi */
+    g.addColorStop(0, 'rgb(255,255,255)');
+    g.addColorStop(0.45, 'rgb(205,205,215)');
+    g.addColorStop(0.75, 'rgb(74,78,96)');
+    g.addColorStop(0.93, 'rgb(19,26,20)');
+    g.addColorStop(1, 'rgb(7,12,8)');
+    ctx.globalCompositeOperation = 'multiply';
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
+    ctx.globalCompositeOperation = 'source-over';
+
+    /* viền cảnh báo: vàng khi bạn đang là sói, đỏ khi sói ở gần bạn */
+    var laSoiToi = soiHienTai === NGUOI;
+    if (gan < 420){
+      var m = Math.pow(1 - gan / 420, 1.4) * (0.55 + 0.45 * Math.sin(Date.now() / 150));
+      var vg = ctx.createRadialGradient(mx, my, Math.min(W, H) * 0.22, mx, my, Math.max(W, H) * 0.62);
+      vg.addColorStop(0, laSoiToi ? 'rgba(228,185,74,0)' : 'rgba(224,67,60,0)');
+      vg.addColorStop(1, (laSoiToi ? 'rgba(228,185,74,' : 'rgba(224,67,60,') + (0.36 * m).toFixed(3) + ')');
+      ctx.fillStyle = vg;
+      ctx.fillRect(0, 0, W, H);
+    }
+
+    /* Mũi tên chỉ hướng. Máy thuộc lòng mê cung còn người chơi thì không — không có cái này
+       thì người chơi mất cả ván chỉ để đi tìm, và "không hề có cơ hội làm sói". */
+    if (soiHienTai === NGUOI){
+      var ganNhat = null, dGan = 1e9;
+      for (var q = 0; q < dsTT.length; q++){
+        if (q === NGUOI) continue;
+        var dq = Math.hypot(dsTT[q].x - toi.x, dsTT[q].y - toi.y);
+        if (dq < dGan){ dGan = dq; ganNhat = dsTT[q]; }
+      }
+      if (ganNhat) veMuiTen(toi, ganNhat, '#e0433c', 'GẦN NHẤT');
+    } else {
+      veMuiTen(toi, dsTT[soiHienTai], '#e4b94a', 'SÓI');
+    }
+
+    /* cần điều khiển */
+    if (joy.bam){
+      ctx.save();
+      ctx.strokeStyle = 'rgba(255,255,255,.18)';
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(joy.ox, joy.oy, BK_JOY, 0, 6.2832); ctx.stroke();
+      if (joy.manh > 0.86){
+        ctx.strokeStyle = 'rgba(74,143,224,.85)';
+        ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.arc(joy.ox, joy.oy, BK_JOY, 0, 6.2832); ctx.stroke();
+      }
+      ctx.fillStyle = joy.manh > 0.86 ? 'rgba(74,143,224,.85)' : 'rgba(255,255,255,.38)';
+      ctx.beginPath(); ctx.arc(joy.x, joy.y, 24, 0, 6.2832); ctx.fill();
+      ctx.restore();
+    }
+
+    veBanDoNho();
+  }
+
+  /* ---------- bản đồ nhỏ ---------- */
+  function veBanDoNho(){
+    var n = banDoNho.width, o = n / CO;
+    ctxBD.clearRect(0, 0, n, n);
+    /* hiện cả mê cung chứ không bắt đi mới mở: máy thuộc bản đồ sẵn, giấu bản đồ chỉ
+       làm khó mình người chơi. Bóng tối trên màn hình vẫn giữ — giấu NGƯỜI, không giấu TƯỜNG. */
+    for (var y = 0; y < CO; y++) for (var x = 0; x < CO; x++){
+      ctxBD.fillStyle = luoi[y][x] === 1 ? 'rgba(104,160,104,.5)' : 'rgba(23,41,26,.95)';
+      ctxBD.fillRect(x * o, y * o, o, o);
+    }
+    /* sói luôn hiện; cừu chỉ hiện khi ở gần bạn */
+    var toi = dsTT[NGUOI];
+    for (var i = 0; i < dsTT.length; i++){
+      var e = dsTT[i], laSoi = (i === soiHienTai);
+      var gan = Math.hypot(e.x - toi.x, e.y - toi.y) < 290;
+      if (!laSoi && !gan && i !== NGUOI) continue;
+      var px = e.x / O * o, py = e.y / O * o;
+      if (laSoi){
+        ctxBD.fillStyle = '#e4b94a';
+        ctxBD.fillRect(px - o, py - o, o * 2, o * 2);
+        ctxBD.strokeStyle = 'rgba(228,185,74,' + (0.3 + 0.4 * Math.abs(Math.sin(Date.now() / 300))) + ')';
+        ctxBD.lineWidth = 1.5;
+        ctxBD.beginPath(); ctxBD.arc(px, py, o * 3, 0, 6.2832); ctxBD.stroke();
+      } else {
+        ctxBD.fillStyle = e.mau;
+        ctxBD.beginPath(); ctxBD.arc(px, py, o * 0.7, 0, 6.2832); ctxBD.fill();
+      }
+      if (i === NGUOI){
+        ctxBD.strokeStyle = '#fff';
+        ctxBD.lineWidth = 1.5;
+        ctxBD.beginPath(); ctxBD.arc(px, py, o * 1.3, 0, 6.2832); ctxBD.stroke();
+      }
+    }
+  }
+
+  /* ---------- vòng lặp ---------- */
+  function vong(t){
+    if (!dangChay) return;
+    requestAnimationFrame(vong);
+    var dt = Math.min(0.05, (t - tgTruoc) / 1000) || 0;
+    tgTruoc = t;
+    if (tamDung || daXong) return;
+
+    conLai -= dt;
+    if (conLai <= 0){ conLai = 0; capNhatHUD(); ketThuc(); return; }
+
+    /* đếm ngược 10 giây cuối */
+    var giay = Math.ceil(conLai);
+    if (giay <= 10 && giay !== giayCuoi){ giayCuoi = giay; AM.tich(giay <= 3); }
+
+    for (var i = 0; i < dsTT.length; i++){
+      var e = dsTT[i];
+      if (e.mien > 0) e.mien -= dt;
+      if (i === soiHienTai) e.tgLamSoi += dt;
+      if (e.laNguoi) dieuKhienNguoi(e, dt);
+      else dieuKhienMay(e, dt);
+    }
+    kiemTraCham();
+
+    var gan = capNhatNhipTim(dt);
+    capNhatHUD();
+
+    if (hienTB > 0){
+      hienTB -= dt;
+      elTB.textContent = chuoiTB;
+      elTB.style.color = mauTB;
+      elTB.style.opacity = hienTB > 0.35 ? '1' : '0';
+    }
+
+    ve(gan);
+  }
+
+  /* ---------- kết thúc ---------- */
+  function ketThuc(){
+    if (daXong) return;
+    daXong = true;
+    var thang = soiHienTai === NGUOI;
+    var elTieu = document.getElementById('ketTieuDe');
+    var elMo = document.getElementById('ketMoTa');
+    var elBang = document.getElementById('ketBang');
+
+    localStorage.setItem('tcbg-soi-van', String(parseInt(localStorage.getItem('tcbg-soi-van') || '0', 10) + 1));
+    if (thang) localStorage.setItem('tcbg-soi-thang', String(parseInt(localStorage.getItem('tcbg-soi-thang') || '0', 10) + 1));
+
+    if (thang){
+      AM.thang();
+      elTieu.textContent = 'BẠN THẮNG';
+      elTieu.style.color = 'var(--nhan)';
+      elMo.textContent = 'Hết giờ khi bạn đang là sói. Giữ được tới giây cuối cùng.';
+    } else {
+      AM.thua();
+      elTieu.textContent = 'BẠN THUA';
+      elTieu.style.color = 'var(--do)';
+      elMo.textContent = dsTT[soiHienTai].ten + ' đang là sói lúc hết giờ.';
+    }
+
+    var hang = dsTT.slice().sort(function(a, b){ return b.tgLamSoi - a.tgLamSoi; });
+    var html = '<div><span>Số lần đổi vai</span><b>' + soLanDoi + '</b></div>';
+    for (var i = 0; i < hang.length; i++){
+      var e = hang[i];
+      var la = e.chiSo === soiHienTai;
+      html += '<div><span style="color:' + e.mau + '">' + e.ten + (la ? ' 🐺' : '') +
+              '</span><b>' + Math.round(e.tgLamSoi) + 's làm sói</b></div>';
+    }
+    elBang.innerHTML = html;
+    elTB.style.opacity = '0';
+    lopKet.classList.remove('an');
+  }
+
+  function datTamDung(b){
+    tamDung = b;
+    lopDung.classList.toggle('an', !b);
+  }
+
+  /* ---------- nút ---------- */
+  document.getElementById('nutDung').onclick = function(){ if (!daXong) datTamDung(true); };
+  document.getElementById('nutTiepTuc').onclick = function(){ datTamDung(false); };
+  document.getElementById('nutVeMenu1').onclick = function(){ veMenu(); };
+  document.getElementById('nutVeMenu2').onclick = function(){ veMenu(); };
+  document.getElementById('nutChoiLai').onclick = function(){ batDau(capKey); };
+  window.addEventListener('resize', function(){
+    if (dangChay){ doLaiCo(); ve(1e9); }
+  });
+
+  /* ---------- API ---------- */
+  function batDau(key){
+    capKey = key;
+    cap = CAP_DO[key];
+    elMenu.classList.add('an');
+    elGame.classList.remove('an');
+    doLaiCo();
+    dungVan();
+    tgTruoc = performance.now();
+    if (!dangChay){
+      dangChay = true;
+      requestAnimationFrame(vong);
+    }
+  }
+
+  function dung(){ dangChay = false; }
+
+  /* cửa sau để thử nghiệm: mở console gõ Soi._noiBo() */
+  function _noiBo(){
+    return { dsTT: dsTT, luoi: luoi,
+             soi: function(){ return soiHienTai; },
+             datSoi: function(i){ soiHienTai = i; dsTT[i].mien = MIEN_CHAM; },
+             datGio: function(g){ conLai = g; },
+             datThoang: function(v){ MUC_THOANG = v; },   /* có hiệu lực từ ván sau */
+             buocNguoi: function(dt){ dieuKhienNguoi(dsTT[NGUOI], dt); },   /* thử điều khiển mà không cần vòng vẽ */
+             soLanDoi: function(){ return soLanDoi; } };
+  }
+
+  return { batDau: batDau, dung: dung, _noiBo: _noiBo };
+})();
+
+/* ---------------------------------------------------------------- CHẠY */
+veMenuChinh();
+window.addEventListener('pointerdown', moKhoaAmThanh, { once: true });
+</script>
+</body>
+</html>

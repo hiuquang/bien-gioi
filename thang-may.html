@@ -1,0 +1,2963 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#08090c">
+<title>Thang Máy 20 Tầng</title>
+<style>
+  :root{
+    --nen:#08090c; --nen2:#111520; --vien:#232a3a;
+    --chu:#e9edf6; --chu-mo:#8b94a9;
+    --nhan:#e4b94a; --do:#e0433c; --xanh:#3fb97a; --lam:#4a8fe0;
+    --vien-sang:#2f3a52;
+    --tren: env(safe-area-inset-top,0px);
+    --duoi: env(safe-area-inset-bottom,0px);
+  }
+  /* VÙNG KHÔNG XÁC ĐỊNH: từ tầng 16 trở lên cả giao diện đổi màu */
+  body.unknown{
+    --nen:#0d0506; --nen2:#1b0e11; --vien:#45191c;
+    --vien-sang:#5d2025; --chu:#f3e3e4; --chu-mo:#ac8186; --nhan:#e0433c;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0;height:100%;background:var(--nen);color:var(--chu);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overscroll-behavior:none}
+  body{user-select:none;-webkit-user-select:none;transition:background .6s}
+  .an{display:none !important}
+  section{position:fixed;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;
+    padding:calc(var(--tren) + 18px) 16px calc(var(--duoi) + 20px)}
+
+  .tieu-de{text-align:center;margin:0 0 4px;font-size:26px;letter-spacing:.16em;font-weight:800}
+  .phu-de{text-align:center;color:var(--chu-mo);font-size:12.5px;margin:0 0 20px;letter-spacing:.06em}
+  .khoi{background:var(--nen2);border:1px solid var(--vien);border-radius:14px;padding:14px 15px;margin-bottom:12px}
+  .khoi h3{margin:0 0 8px;font-size:13px;letter-spacing:.12em;color:var(--nhan)}
+  .khoi p{margin:0 0 8px;font-size:13.5px;line-height:1.6;color:#cdd4e3}
+  .khoi p:last-child{margin-bottom:0}
+  body.unknown .khoi p{color:#e0cdcf}
+  .nut{width:100%;border:0;border-radius:12px;padding:15px 12px;font:inherit;font-weight:700;
+    font-size:15.5px;cursor:pointer;margin-top:4px}
+  .nut.chinh{background:var(--nhan);color:#191204}
+  body.unknown .nut.chinh{color:#fff}
+  .nut.phu{background:transparent;color:var(--chu-mo);border:1px solid var(--vien)}
+  .nut:active{transform:scale(.99)}
+  .bang-luat{width:100%;border-collapse:collapse;font-size:13.5px;margin:2px 0 4px}
+  .bang-luat td{padding:7px 4px;border-bottom:1px solid var(--vien)}
+  .bang-luat td:last-child{text-align:right;font-weight:800;white-space:nowrap}
+  .len{color:var(--xanh)} .xuong{color:#e0a23c} .chet{color:var(--do)}
+
+  /* ---------- PHÒNG HỒ SƠ ---------- */
+  #dongHoDoc{position:sticky;top:0;z-index:5;background:var(--nen);padding:6px 0 10px;
+    text-align:center;font-size:30px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:.06em}
+  #dongHoDoc.gap{color:var(--do)}
+  .thanh-gio{height:3px;background:var(--vien);border-radius:3px;overflow:hidden;margin-bottom:12px}
+  .thanh-gio i{display:block;height:100%;background:var(--nhan);width:100%;transition:width .25s linear}
+  .hs{width:100%;text-align:left;background:var(--nen2);border:1px solid var(--vien);border-radius:13px;
+    padding:13px 14px;margin-bottom:9px;color:var(--chu);font:inherit;cursor:pointer;display:block}
+  .hs .ten-hs{font-weight:700;font-size:14.5px;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+  .hs .meta{color:var(--chu-mo);font-size:11.5px;margin-top:4px;letter-spacing:.04em}
+  .dau{font-size:9.5px;font-weight:800;letter-spacing:.09em;padding:2px 6px;border-radius:5px;
+    background:rgba(63,185,122,.15);color:var(--xanh);border:1px solid rgba(63,185,122,.4)}
+  .khongdau{font-size:9.5px;font-weight:800;letter-spacing:.09em;padding:2px 6px;border-radius:5px;
+    background:rgba(139,148,169,.12);color:var(--chu-mo);border:1px solid var(--vien)}
+  .hs.daDoc{border-color:var(--vien-sang)}
+  .hs.daDoc .ten-hs:after{content:'đã đọc';font-size:10px;font-weight:600;color:var(--chu-mo);letter-spacing:.06em}
+  /* ---------- PHÒNG HỒ SƠ ĐI LẠI ĐƯỢC ---------- */
+  #manHoSo{display:flex;flex-direction:column;overflow:hidden;padding:calc(var(--tren) + 10px) 12px calc(var(--duoi) + 12px)}
+  #manHoSo.an{display:none !important}
+  .dinh-phong{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:5px}
+  .dinh-phong .nhan-phong{font-size:10.5px;letter-spacing:.14em;color:var(--chu-mo);font-weight:700}
+  #khungSan{position:relative;flex:1;min-height:0;display:flex;align-items:center;justify-content:center;
+    margin:4px 0 8px}
+  #sanPhong{display:block;border:1px solid var(--vien);border-radius:14px;background:#06070a;touch-action:none}
+  #goiY{position:absolute;left:50%;transform:translateX(-50%);bottom:12px;max-width:94%;
+    background:rgba(6,7,10,.86);border:1px solid var(--vien-sang);border-radius:10px;
+    padding:7px 11px;font-size:11.5px;color:#cdd4e3;text-align:center;line-height:1.45;
+    transition:opacity .5s;pointer-events:none}
+  #demHS{display:flex;gap:5px;justify-content:center;margin-bottom:7px}
+  #demHS i{width:100%;max-width:38px;height:4px;border-radius:3px;background:var(--vien);display:block}
+  #demHS i.xong{background:var(--xanh)}
+  #nutDocTram{margin-top:0;transition:opacity .2s}
+  #nutDocTram.tat{opacity:.32}
+  #nutBoQua{margin-top:7px;padding:10px;font-size:13px}
+  #dongHoLop{font-variant-numeric:tabular-nums;font-weight:800;font-size:15px;color:var(--nhan)}
+  #dongHoLop.gap{color:var(--do)}
+  #lopHS .dau-giay{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .hang .hs-dem{width:27px;text-align:right;font-size:9.5px;color:var(--chu-mo);
+    white-space:nowrap;font-variant-numeric:tabular-nums}
+
+  #lopHS{position:fixed;inset:0;background:rgba(4,5,8,.92);z-index:20;display:flex;align-items:flex-end;
+    padding:calc(var(--tren) + 14px) 10px calc(var(--duoi) + 10px)}
+  #lopHS .giay{background:var(--nen2);border:1px solid var(--vien-sang);border-radius:16px;width:100%;
+    max-height:100%;overflow-y:auto;padding:18px 17px}
+  #lopHS h2{margin:0 0 3px;font-size:17px;letter-spacing:.06em}
+  #lopHS .meta{color:var(--chu-mo);font-size:11.5px;margin-bottom:12px}
+  #lopHS li{font-size:13.5px;line-height:1.65;margin-bottom:7px;color:#cdd4e3}
+  #lopHS ul{margin:0 0 14px;padding-left:18px}
+
+  /* ---------- VÒNG CHƠI ---------- */
+  #manVong{padding-top:calc(var(--tren) + 10px);display:flex;flex-direction:column;overflow:hidden}
+  #manVong.an{display:none !important}
+  #khungThap{flex:1;min-height:150px;margin-bottom:10px;border:1px solid var(--vien);
+    border-radius:14px;overflow:hidden;background:#06070a;position:relative}
+  #thap{display:block}
+  .doi-gioi{display:flex;gap:10px}
+  .doi-gioi .gioi{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 6px 8px;
+    background:#0d1119;border:1.5px solid var(--vien);border-radius:12px;color:var(--chu-mo);
+    font:inherit;font-weight:800;font-size:13px;letter-spacing:.06em;cursor:pointer}
+  .doi-gioi .gioi canvas{width:63px;height:84px}
+  .doi-gioi .gioi.chon{border-color:var(--nhan);color:var(--nhan);background:rgba(228,185,74,.07)}
+  #khungChat{margin-bottom:8px}
+  #dongChat{height:92px;overflow-y:auto;background:var(--nen2);border:1px solid var(--vien);border-radius:12px;
+    padding:6px 10px;font-size:12px;line-height:1.45;-webkit-overflow-scrolling:touch}
+  #dongChat .tin{padding:2px 0;color:#c6cee0}
+  #dongChat .tin b{color:#8fa1c8;margin-right:3px;letter-spacing:.03em}
+  #dongChat .tin.cua-ban b{color:var(--nhan)}
+  #dongChat .tin.he{color:var(--chu-mo);font-style:italic}
+  body.unknown #dongChat .tin{color:#e2c9cb}
+  #nutChat{display:flex;gap:6px;overflow-x:auto;margin-top:6px;padding-bottom:2px}
+  #nutChat .chip{flex:0 0 auto;border:1px solid var(--vien-sang);background:#0e121b;color:#c6cee0;
+    border-radius:999px;padding:6px 11px;font:inherit;font-size:11.5px;font-weight:700;cursor:pointer;white-space:nowrap}
+  #nutChat .chip.ban{border-color:rgba(228,185,74,.55);color:var(--nhan)}
+  #lopHS .giay{max-height:86vh;overflow-y:auto}
+  #lopHS .to-hs{border-top:1px solid var(--vien);padding-top:10px;margin-top:4px}
+  #lopHS .ten-to{font-weight:800;font-size:13.5px;letter-spacing:.05em;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+  #lopHS .ngay-to{color:var(--chu-mo);font-size:11px;margin:2px 0 6px}
+  /* thanh trên cùng: gọn một dòng (user chê bản ba ô to quá — 16/11/2026),
+     nhường chỗ cho toà nhà */
+  .thanh-dinh{display:flex;gap:6px;margin-bottom:6px}
+  .o{flex:1;background:var(--nen2);border:1px solid var(--vien);border-radius:8px;padding:3px 8px;
+    display:flex;align-items:baseline;justify-content:center;gap:6px}
+  .o .nho{font-size:9px;letter-spacing:.1em;color:var(--chu-mo)}
+  .o .to{font-size:13.5px;font-weight:800;font-variant-numeric:tabular-nums}
+  .san{display:flex;gap:12px;align-items:stretch}
+  .ong{width:46px;flex:0 0 46px;position:relative;background:linear-gradient(180deg,#0c0f17,#151a27);
+    border:1px solid var(--vien);border-radius:10px;min-height:270px;overflow:hidden}
+  body.unknown .ong{background:linear-gradient(180deg,#150709,#240f12)}
+  .ong .moc{position:absolute;left:0;right:0;height:1px;background:var(--vien)}
+  .ong .so-moc{position:absolute;left:3px;font-size:8.5px;color:var(--chu-mo)}
+  .ong .moc13{background:var(--do);opacity:.55}
+  .cabin{position:absolute;left:5px;right:5px;height:22px;border-radius:10px;background:var(--nhan);
+    color:#191204;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;
+    transition:bottom .75s cubic-bezier(.3,.9,.3,1)}
+  body.unknown .cabin{background:var(--do);color:#fff}
+  .phai{flex:1;min-width:0}
+  .hoi{background:var(--nen2);border:1px solid var(--vien);border-radius:14px;padding:0 0 14px;overflow:hidden}
+  .hoi .gio{height:4px;background:var(--vien)}
+  .hoi .gio i{display:block;height:100%;background:var(--nhan);width:100%;transition:width .2s linear}
+  .hoi .nhom{font-size:10px;letter-spacing:.12em;color:var(--chu-mo);padding:11px 14px 0}
+  .hoi .cau{font-size:17px;line-height:1.5;font-weight:600;padding:7px 14px 0}
+  .doi-nut{display:flex;gap:9px;margin-top:11px}
+  .chon{flex:1;border:1.5px solid var(--vien);background:#0e121b;color:var(--chu);border-radius:12px;
+    padding:16px 6px;font:inherit;font-weight:800;font-size:16px;letter-spacing:.08em;cursor:pointer}
+  body.unknown .chon{background:#17090b}
+  .chon.d.sang{border-color:var(--xanh);background:rgba(63,185,122,.14);color:var(--xanh)}
+  .chon.s.sang{border-color:var(--do);background:rgba(224,67,60,.14);color:var(--do)}
+  .ghi-chu{font-size:11.5px;color:var(--chu-mo);text-align:center;margin-top:9px;line-height:1.5}
+
+  .bang-tang{margin-top:12px}
+  .hang{display:flex;align-items:center;gap:8px;padding:5px 2px;font-size:12.5px;
+    border-bottom:1px solid rgba(255,255,255,.04)}
+  .hang .ten{width:52px;flex:0 0 52px;font-weight:700;letter-spacing:.03em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .hang.ban .ten{color:var(--nhan)}
+  .hang .thanh{flex:1;height:7px;background:#171c28;border-radius:4px;overflow:hidden}
+  body.unknown .hang .thanh{background:#201012}
+  .hang .thanh i{display:block;height:100%;background:var(--vien-sang);border-radius:10px;transition:width .6s}
+  .hang.ban .thanh i{background:var(--nhan)}
+  .hang .so{width:22px;text-align:right;font-variant-numeric:tabular-nums;color:var(--chu-mo)}
+  .hang .doi{width:30px;text-align:right;font-weight:800;font-size:11.5px}
+  .hang.die{opacity:.35}
+  .hang.die .ten{text-decoration:line-through;color:var(--do)}
+  .hang.tk .ten{width:auto;flex:1}
+  .hang.tk .so{width:auto;color:var(--chu);font-weight:700}
+
+  .hoi .ket-ban{padding:11px 14px 0;font-size:15px;font-weight:800;line-height:1.4}
+  .hoi .ket-ban.len{color:var(--xanh)}
+  .hoi .ket-ban.xuong{color:#e0a23c}
+  .hoi .ket-ban.chet{color:var(--do)}
+  .hoi .ket-ban .ai{display:block;font-size:11.5px;font-weight:600;color:var(--chu-mo);margin-top:3px}
+  .hoi .giai{font-size:12.5px;line-height:1.6;color:#b9c2d4;padding:9px 14px 0;margin-top:8px;
+    border-top:1px solid var(--vien)}
+  body.unknown .hoi .giai{color:#d8bcbe}
+  #nutTiep{font-variant-numeric:tabular-nums}
+  /* ---------- LỘ KẾT QUẢ (bỏ lớp phủ, giữ lại vài lớp màu) ---------- */
+  .dap{text-align:center;font-size:20px;font-weight:800;letter-spacing:.08em;margin:10px 0 4px}
+  .ket-ban{text-align:center;font-size:15px;font-weight:700;margin-bottom:12px}
+  .giai{font-size:13px;line-height:1.65;color:#c7cedd;background:#0d1119;border:1px solid var(--vien);
+    border-radius:10px;padding:11px 12px;margin-bottom:12px}
+  body.unknown .giai{background:#170a0c;color:#dcc6c8}
+  .loai-ds{font-size:12.5px;color:var(--do);margin-bottom:12px;line-height:1.6}
+  .nho-cap{font-size:10px;letter-spacing:.12em;color:var(--chu-mo);margin-bottom:2px}
+
+  .chan{color:var(--chu-mo);font-size:11.5px;line-height:1.65;text-align:center;margin-top:16px}
+  .canh-bao{border-color:var(--do);background:rgba(224,67,60,.08)}
+</style>
+</head>
+<body>
+
+<!-- ============ MÀN LUẬT ============ -->
+<section id="manLuat">
+  <h1 class="tieu-de">THANG MÁY</h1>
+  <p class="phu-de">20 tầng &middot; 8 người &middot; chỉ một lối ra</p>
+
+  <div class="khoi">
+    <h3>LUẬT</h3>
+    <p>Bắt đầu ở <b>tầng 5</b>. Lên <b>tầng 20</b> là thoát. Mỗi vòng chọn <b>ĐÚNG</b> hay <b>SAI</b>, phiếu kín, <b>1 phút 45</b>.</p>
+    <table class="bang-luat">
+      <tr><td>Đúng, cùng đa số</td><td class="len">+1</td></tr>
+      <tr><td>Đúng, thiểu số</td><td class="len">+3</td></tr>
+      <tr><td>Sai, cùng đa số</td><td class="xuong">−2</td></tr>
+      <tr><td>Sai, thiểu số</td><td class="chet">BỊ LOẠI</td></tr>
+      <tr><td>Hết giờ chưa chọn</td><td class="xuong">−2</td></tr>
+      <tr><td>Hòa phiếu</td><td>đứng yên</td></tr>
+    </table>
+  </div>
+
+  <div class="khoi">
+    <h3>PHÒNG HỒ SƠ</h3>
+    <p><b>1 phút 30</b> để đi đọc. 12 tờ, đổi mỗi ván — không đọc hết nổi. Vào thang thì <b>hỏi trong chat</b> ai đã đọc gì.</p>
+  </div>
+
+  <div class="khoi">
+    <h3>TỪ TẦNG 16</h3>
+    <p>Câu <b>cực khó</b>: AI, lượng tử, kinh tế, xã hội, toán. Mỗi người máy rành một mảng và sẽ lên tiếng — nhưng có <b>2 kẻ nói dối</b>. Nhìn <b>✓✗</b> dưới cabin để biết nên tin ai.</p>
+  </div>
+
+  <div class="khoi">
+    <h3>NHÂN VẬT CỦA BẠN</h3>
+    <div id="chonGioi" class="doi-gioi"></div>
+  </div>
+
+  <div class="khoi">
+    <h3>MỨC KHÓ</h3>
+    <div id="dsCap"></div>
+  </div>
+
+  <button class="nut chinh" id="nutVao">VÀO PHÒNG HỒ SƠ</button>
+  <button class="nut phu" id="nutVeBoSuu" style="margin-top:9px">← Về danh sách trò chơi</button>
+  <p class="chan">Trò chơi tự dựng, không liên quan tác phẩm thương mại nào.</p>
+</section>
+
+<!-- ============ PHÒNG HỒ SƠ ============ -->
+<section id="manHoSo" class="an">
+  <div class="dinh-phong">
+    <span class="nhan-phong">TẦNG 1 · PHÒNG LƯU HỒ SƠ</span>
+    <span id="dongHoDoc">1:30</span>
+  </div>
+  <div class="thanh-gio"><i id="thanhDoc"></i></div>
+  <div id="demHS"></div>
+  <div id="khungSan">
+    <canvas id="sanPhong"></canvas>
+    <div id="goiY">Kéo trên sàn để đi · tới gần tập hồ sơ rồi bấm ĐỌC</div>
+  </div>
+  <button class="nut chinh tat" id="nutDocTram">ĐI TỚI MỘT TẬP HỒ SƠ</button>
+  <button class="nut phu" id="nutBoQua">Vào thang máy ngay →</button>
+</section>
+
+<div id="lopHS" class="an"><div class="giay">
+  <div class="dau-giay"><h2 id="hsTen"></h2><span id="dongHoLop">1:30</span></div>
+  <div class="meta" id="hsMeta"></div>
+  <ul id="hsNoi"></ul>
+  <button class="nut chinh" id="nutDongHS">Đóng</button>
+</div></div>
+
+<!-- ============ VÒNG CHƠI ============ -->
+<section id="manVong" class="an">
+  <div class="thanh-dinh">
+    <div class="o"><div class="nho">VÒNG</div><div class="to" id="soVong">1</div></div>
+    <div class="o"><div class="nho">TẦNG</div><div class="to" id="tangBan">5</div></div>
+    <div class="o"><div class="nho">CÒN SỐNG</div><div class="to" id="conSong">8</div></div>
+  </div>
+
+  <div id="khungThap"><canvas id="thap"></canvas></div>
+  <div id="khungChat"><div id="dongChat"></div><div id="nutChat"></div></div>
+
+  <div class="hoi">
+    <div class="gio"><i id="thanhGio"></i></div>
+    <div class="nhom" id="nhomCau">KIẾN THỨC</div>
+    <div class="cau" id="cauHoi">…</div>
+    <div class="ket-ban an" id="ketBan"></div>
+    <div class="giai an" id="giaiThich"></div>
+  </div>
+  <div class="doi-nut" id="khoiChon">
+    <button class="chon d" id="nutDung2">ĐÚNG</button>
+    <button class="chon s" id="nutSai">SAI</button>
+  </div>
+  <button class="nut chinh an" id="nutKhoa" style="margin-top:9px">KHÓA LỰA CHỌN</button>
+  <button class="nut phu an" id="nutTiep" style="margin-top:9px">VÒNG SAU · 15</button>
+  <p class="ghi-chu" id="ghiChu">Chọn một bên. Khóa sớm thì mọi người khóa theo.</p>
+</section>
+
+
+<!-- ============ MÀN KẾT ============ -->
+<section id="manKet" class="an">
+  <h1 class="tieu-de" id="ketTieuDe">HẾT</h1>
+  <p class="phu-de" id="ketPhu"></p>
+  <div class="khoi"><div class="bang-tang" id="bangCuoi"></div></div>
+  <div class="khoi"><h3>TRẬN NÀY</h3><div id="thongKe"></div></div>
+  <button class="nut chinh" id="nutChoiLai">CHƠI LẠI</button>
+  <button class="nut phu" id="nutVeBoSuu2" style="margin-top:9px">← Về danh sách trò chơi</button>
+</section>
+
+<script>
+'use strict';
+/* =====================================================================
+   THANG MÁY 20 TẦNG — một file HTML, không thư viện ngoài.
+   Bạn + 7 người máy. Mỗi vòng một mệnh đề đúng/sai, lựa chọn bí mật,
+   kết quả phụ thuộc cả vào đáp án LẪN việc đám đông chọn gì.
+   ===================================================================== */
+
+/* ---------------------------------------------------------------- ÂM THANH */
+var ctxAm = null, raAm = null;
+var batAm = localStorage.getItem('tcbg-am') !== '0';
+function moAm(){
+  if (ctxAm) { if (ctxAm.state === 'suspended') ctxAm.resume(); return; }
+  var A = window.AudioContext || window.webkitAudioContext;
+  if (!A) return;
+  ctxAm = new A();
+  var n = ctxAm.createDynamicsCompressor(), g = ctxAm.createGain();
+  g.gain.value = 1.2; n.connect(g); g.connect(ctxAm.destination); raAm = n;
+}
+function noi(o){
+  if (!batAm || !ctxAm) return;
+  var t = ctxAm.currentTime + (o.tre || 0);
+  var d = ctxAm.createOscillator(), g = ctxAm.createGain();
+  d.type = o.loai || 'sine';
+  d.frequency.setValueAtTime(o.f, t);
+  if (o.f2) d.frequency.exponentialRampToValueAtTime(o.f2, t + o.dai);
+  g.gain.setValueAtTime(0, t);
+  g.gain.linearRampToValueAtTime(o.am || 0.2, t + 0.012);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + o.dai);
+  d.connect(g); g.connect(raAm); d.start(t); d.stop(t + o.dai + 0.02);
+}
+var AM = {
+  tich:  function(){ noi({ f: 760, dai: 0.05, loai: 'square', am: 0.1 }); },
+  chon:  function(){ noi({ f: 520, dai: 0.09, loai: 'triangle', am: 0.22 }); },
+  khoa:  function(){ noi({ f: 300, f2: 150, dai: 0.22, loai: 'square', am: 0.25 }); },
+  lo:    function(){ noi({ f: 180, f2: 420, dai: 0.3, loai: 'sawtooth', am: 0.18 }); },
+  len:   function(){ [523, 784].forEach(function(f, i){ noi({ f: f, dai: 0.22, loai: 'triangle', am: 0.26, tre: i * 0.09 }); }); },
+  vot:   function(){ [523, 659, 988].forEach(function(f, i){ noi({ f: f, dai: 0.3, loai: 'triangle', am: 0.3, tre: i * 0.08 }); }); },
+  xuong: function(){ [392, 294].forEach(function(f, i){ noi({ f: f, dai: 0.3, loai: 'sine', am: 0.26, tre: i * 0.1 }); }); },
+  loai:  function(){ noi({ f: 220, f2: 60, dai: 0.7, loai: 'sawtooth', am: 0.3 }); },
+  pha2:  function(){ [140, 120, 100].forEach(function(f, i){ noi({ f: f, dai: 1.1, loai: 'sawtooth', am: 0.22, tre: i * 0.18 }); }); },
+  thang: function(){ [523, 659, 784, 1047, 1319].forEach(function(f, i){ noi({ f: f, dai: 0.45, loai: 'triangle', am: 0.3, tre: i * 0.11 }); }); },
+  thua:  function(){ [392, 330, 262].forEach(function(f, i){ noi({ f: f, dai: 0.55, loai: 'sawtooth', am: 0.22, tre: i * 0.17 }); }); }
+};
+
+/* ---------------------------------------------------------------- HỒ SƠ */
+/* Quy tắc đọc hồ sơ nằm trong chính hồ sơ (QT) — câu hỏi về sau dựa vào nó.
+   Mọi mâu thuẫn trong bộ này đều có đáp án xác định, không có chỗ nào mơ hồ. */
+var TAI_LIEU = [];   /* sinh mới mỗi ván — xem taoHoSo() */
+
+/* ---------------------------------------------------------------- CÂU HỎI
+   t  = mệnh đề          d = đáp án đúng (true = ĐÚNG)
+   n  = người thường chọn ĐÚNG với tỉ lệ bao nhiêu (đây là cái bẫy: n cao mà d sai
+        nghĩa là cả phòng sắp sai, ai biết thì được +3)
+   k  = độ khó (0 dễ, 1 hiểm)      g = giải thích       nh = nhóm
+   pha= 1 (trước khi ai đó chạm tầng 16) hay 2 (vùng không xác định)
+   d có thể là HÀM (tt) để ra câu hỏi về chính ván đang chơi.                      */
+var CAU_CO_DINH = [
+  /* ---- PHA 1: kiến thức ---- */
+  { t: 'Nước tinh khiết đóng băng ở 0°C trong điều kiện áp suất tiêu chuẩn.', d: true, n: 0.93, k: .1, nh: 'KIẾN THỨC',
+    g: 'Đúng. Đây là định nghĩa của thang Celsius ở áp suất 1 atm.' },
+  { t: 'Dơi là một loài chim.', d: false, n: 0.1, k: .1, nh: 'KIẾN THỨC',
+    g: 'Sai. Dơi là động vật có vú — đẻ con và cho con bú.' },
+  { t: 'Một năm ánh sáng là đơn vị đo thời gian.', d: false, n: 0.18, k: .3, nh: 'KIẾN THỨC',
+    g: 'Sai. Đó là đơn vị đo khoảng cách: quãng đường ánh sáng đi trong một năm.' },
+  { t: 'Sao Kim nóng hơn Sao Thủy, dù nó ở xa Mặt Trời hơn.', d: true, n: 0.18, k: .6, nh: 'KIẾN THỨC',
+    g: 'Đúng. Khí quyển CO₂ dày của Sao Kim giữ nhiệt, bề mặt khoảng 460°C, nóng hơn Sao Thủy.' },
+  { t: 'Cá voi là động vật có vú.', d: true, n: 0.9, k: .15, nh: 'KIẾN THỨC',
+    g: 'Đúng. Cá voi thở bằng phổi, đẻ con và cho con bú.' },
+  { t: 'Vạn Lý Trường Thành có thể nhìn thấy bằng mắt thường từ Mặt Trăng.', d: false, n: 0.78, k: .3, nh: 'KIẾN THỨC',
+    g: 'Sai. Đây là chuyện đồn lâu đời. Ở khoảng cách đó, tường rộng vài mét là vô hình.' },
+  { t: 'Máu trong tĩnh mạch người có màu xanh.', d: false, n: 0.75, k: .3, nh: 'KIẾN THỨC',
+    g: 'Sai. Máu luôn đỏ; tĩnh mạch trông xanh là do cách da và ánh sáng tán xạ.' },
+  { t: 'Nhện là côn trùng.', d: false, n: 0.72, k: .3, nh: 'KIẾN THỨC',
+    g: 'Sai. Côn trùng có 6 chân và 3 phần thân. Nhện 8 chân, thuộc lớp hình nhện.' },
+  { t: 'Sét không bao giờ đánh hai lần vào cùng một chỗ.', d: false, n: 0.16, k: .2, nh: 'KIẾN THỨC',
+    g: 'Sai. Các cột cao bị đánh nhiều lần mỗi năm.' },
+  { t: 'Chim cánh cụt sống ở Bắc Cực.', d: false, n: 0.18, k: .2, nh: 'KIẾN THỨC',
+    g: 'Sai. Chim cánh cụt gần như chỉ sống ở Nam bán cầu.' },
+  { t: 'Mặt Trời là một ngôi sao.', d: true, n: 0.93, k: .1, nh: 'KIẾN THỨC',
+    g: 'Đúng. Một ngôi sao loại G, chỉ gần ta hơn các ngôi sao khác rất nhiều.' },
+  { t: 'Một ngày trên Sao Kim dài hơn một năm trên Sao Kim.', d: true, n: 0.16, k: .7, nh: 'KIẾN THỨC',
+    g: 'Đúng. Sao Kim tự quay 243 ngày Trái Đất, nhưng quay quanh Mặt Trời chỉ 225 ngày.' },
+  { t: 'Trong cơ thể người có nhiều tế bào vi khuẩn hơn tế bào người.', d: true, n: 0.22, k: .6, nh: 'KIẾN THỨC',
+    g: 'Đúng. Ước tính hiện nay là xấp xỉ 1,3 vi khuẩn cho mỗi tế bào người — vi khuẩn nhỏ hơn rất nhiều nên vẫn nhẹ.' },
+  { t: 'Thủy tinh là chất lỏng chảy chậm, nên kính nhà thờ cổ dày hơn ở phía dưới.', d: false, n: 0.76, k: .6, nh: 'KIẾN THỨC',
+    g: 'Sai. Thủy tinh là chất rắn vô định hình. Kính cổ dày không đều vì kỹ thuật cán thời đó, và thợ thường lắp cạnh dày xuống dưới.' },
+
+  /* ---- PHA 1: logic ---- */
+  { t: 'Nếu A lớn hơn B và B lớn hơn C thì A lớn hơn C.', d: true, n: 0.95, k: .05, nh: 'LOGIC',
+    g: 'Đúng. Đó là tính bắc cầu của quan hệ lớn hơn.' },
+  { t: 'Mọi số chia hết cho 4 đều chia hết cho 2.', d: true, n: 0.88, k: .2, nh: 'LOGIC',
+    g: 'Đúng. 4 = 2 × 2, nên cái gì chia hết cho 4 thì cũng chia hết cho 2.' },
+  { t: 'Mọi số chia hết cho 2 đều chia hết cho 4.', d: false, n: 0.16, k: .2, nh: 'LOGIC',
+    g: 'Sai. 6 chia hết cho 2 nhưng không chia hết cho 4.' },
+  { t: 'Trời mưa thì đường ướt. Đường đang ướt, vậy chắc chắn trời đã mưa.', d: false, n: 0.72, k: .45, nh: 'LOGIC',
+    g: 'Sai. Xe tưới nước cũng làm đường ướt. Từ kết quả không suy ngược ra nguyên nhân duy nhất được.' },
+  { t: 'Tung đồng xu 5 lần đều ra ngửa thì lần thứ 6 khả năng ra sấp cao hơn.', d: false, n: 0.22, k: .4, nh: 'LOGIC',
+    g: 'Sai. Đồng xu không có trí nhớ. Vẫn là 50-50.' },
+  { t: 'Số 1 là số nguyên tố.', d: false, n: 0.7, k: .4, nh: 'LOGIC',
+    g: 'Sai. Số nguyên tố phải có đúng hai ước dương. Số 1 chỉ có một.' },
+  { t: 'Số 0,999… (lặp vô hạn) bằng đúng 1.', d: true, n: 0.14, k: .7, nh: 'LOGIC',
+    g: 'Đúng. Hai cách viết của cùng một số. 1/3 = 0,333… nhân ba vế lên là ra.' },
+  { t: 'Trong nhóm 23 người, khả năng có hai người trùng ngày sinh là dưới 10%.', d: false, n: 0.78, k: .6, nh: 'LOGIC',
+    g: 'Sai. Xấp xỉ 50%. Vì ta đếm số CẶP người (253 cặp), không phải số người.' },
+  { t: 'Nếu mọi con mèo đều sợ nước, và Mun là mèo, thì Mun sợ nước.', d: true, n: 0.92, k: .1, nh: 'LOGIC',
+    g: 'Đúng. Tam đoạn luận chuẩn — đúng theo hình thức, bất kể mèo thật có sợ nước hay không.' },
+  { t: 'Một kilogram sắt nặng hơn một kilogram bông.', d: false, n: 0.1, k: .1, nh: 'LOGIC',
+    g: 'Sai. Bằng nhau. Chỉ khác thể tích.' },
+  { t: 'Nếu cứ đi nửa quãng đường còn lại mãi thì không bao giờ tới nơi.', d: false, n: 0.25, k: .5, nh: 'LOGIC',
+    g: 'Sai. Tổng vô hạn các quãng ngày càng ngắn vẫn hội tụ về một số hữu hạn — nghịch lý Zeno đã được giải.' },
+
+  /* ---- PHA 1: tâm lý đám đông ---- */
+  { t: 'Đa số luôn đưa ra quyết định đúng.', d: false, n: 0.12, k: .1, nh: 'ĐÁM ĐÔNG',
+    g: 'Sai. "Luôn" là từ giết mệnh đề này. Cả phòng cùng sai là chuyện xảy ra thường xuyên — kể cả ở đây.' },
+  { t: 'Trong phòng này, chọn theo đa số thì không bao giờ bị loại.', d: true, n: 0.8, k: .35, nh: 'ĐÁM ĐÔNG',
+    g: 'Đúng — theo đúng luật thang máy: bị loại chỉ xảy ra khi SAI và THIỂU SỐ. Theo đa số thì tệ nhất là −2 tầng.' },
+  { t: 'Có thể vừa chọn đúng đáp án vừa bị loại.', d: false, n: 0.7, k: .5, nh: 'ĐÁM ĐÔNG',
+    g: 'Sai. Chọn đúng thì chỉ có +1 hoặc +3. Bị loại là chọn SAI và ở thiểu số.' },
+  { t: 'Nếu cả phòng chọn giống hệt nhau thì không ai bị loại vòng đó.', d: true, n: 0.8, k: .45, nh: 'ĐÁM ĐÔNG',
+    g: 'Đúng. Không có thiểu số thì không có ai bị loại — cả phòng cùng +1 hoặc cùng −2.' },
+  { t: 'Người càng biết ít về một chủ đề thì càng dễ tự tin quá mức về nó.', d: true, n: 0.8, k: .5, nh: 'ĐÁM ĐÔNG',
+    g: 'Đúng. Hiệu ứng Dunning–Kruger: thiếu kiến thức thì cũng thiếu luôn khả năng nhận ra mình thiếu.' },
+
+  /* (câu HỒ SƠ cố định đã bỏ: giờ sinh theo hồ sơ từng ván trong taoHoSo()) */
+
+  /* ---- PHA 1: BẪY NIỀM TIN ----
+     Loại câu đắt nhất của game này. Cả phòng TIN CHẮC một điều sai → đa số sai →
+     ai biết sự thật được +3 và KHÔNG AI bị loại. Vì vậy `n` phải lệch mạnh về phía
+     đám đông tin, còn `d` thì ngược lại. Câu mà `n` quanh 0,5 là câu hỏng: phòng
+     chia đôi, chết hàng loạt mà chẳng ai học được gì. */
+  { t: 'Vạn Lý Trường Thành có thể nhìn thấy bằng mắt thường từ Mặt Trăng.', d: false, n: 0.66, k: .35, nh: 'BẪY NIỀM TIN',
+    g: 'Sai. Từ Mặt Trăng, Trái Đất chỉ là một quả cầu xanh — không công trình nào của con người thấy được bằng mắt thường. Ngay trên quỹ đạo thấp, tường thành cũng khó thấy vì nó hẹp và cùng màu với đất.' },
+  { t: 'Cá vàng chỉ nhớ được khoảng ba giây.', d: false, n: 0.70, k: .3, nh: 'BẪY NIỀM TIN',
+    g: 'Sai. Cá vàng nhớ được hàng tháng — thí nghiệm cho chúng học giờ ăn và đường đi trong mê cung. Câu "ba giây" là chuyện bịa lan truyền.' },
+  { t: 'Đà điểu rúc đầu xuống cát khi hoảng sợ.', d: false, n: 0.64, k: .3, nh: 'BẪY NIỀM TIN',
+    g: 'Sai. Nó cúi xuống để đảo trứng trong tổ cát, hoặc nằm ép sát đất cho đỡ lộ. Rúc đầu xuống cát thì ngạt thở.' },
+  { t: 'Dơi bị mù hoàn toàn.', d: false, n: 0.58, k: .3, nh: 'BẪY NIỀM TIN',
+    g: 'Sai. Mọi loài dơi đều nhìn được; nhiều loài còn nhìn tốt. Định vị bằng tiếng vang là để bổ sung trong đêm, không phải để thay mắt.' },
+  { t: 'Napoléon thấp hơn chiều cao trung bình của đàn ông Pháp thời ông.', d: false, n: 0.78, k: .5, nh: 'BẪY NIỀM TIN',
+    g: 'Sai. Ông cao khoảng 1m68, nhỉnh hơn mức trung bình thời đó. Tiếng "lùn" đến từ tranh biếm hoạ Anh và từ việc đơn vị đo của Pháp khác đơn vị của Anh.' },
+  { t: 'Tắc kè hoa đổi màu chủ yếu để nguỵ trang.', d: false, n: 0.80, k: .5, nh: 'BẪY NIỀM TIN',
+    g: 'Sai. Chủ yếu để ra hiệu với đồng loại và để điều nhiệt. Màu nền chúng đã khá hợp với cây rồi, không cần đổi để trốn.' },
+  { t: 'Máu trong tĩnh mạch có màu xanh cho tới khi gặp không khí.', d: false, n: 0.52, k: .35, nh: 'BẪY NIỀM TIN',
+    g: 'Sai. Máu người luôn đỏ — chỉ đậm hơn khi ít oxy. Tĩnh mạch trông xanh là do cách da và mô tán xạ ánh sáng, không phải màu của máu.' },
+  { t: 'Sét không bao giờ đánh hai lần vào cùng một chỗ.', d: false, n: 0.56, k: .25, nh: 'BẪY NIỀM TIN',
+    g: 'Sai. Toà Empire State bị đánh khoảng 25 lần mỗi năm. Chỗ cao và nhọn thì càng bị đánh nhiều lần.' },
+  { t: 'Chuối là quả mọng theo phân loại thực vật, còn dâu tây thì không.', d: true, n: 0.22, k: .55, nh: 'BẪY NIỀM TIN',
+    g: 'Đúng. Quả mọng phải sinh từ một bầu nhuỵ duy nhất — chuối hợp, dâu tây thì phần đỏ là đế hoa phình ra, "hạt" bên ngoài mới là quả thật.' },
+  { t: 'Mặt Trời thực ra có màu trắng, không phải vàng.', d: true, n: 0.26, k: .5, nh: 'BẪY NIỀM TIN',
+    g: 'Đúng. Ngoài khí quyển, Mặt Trời trắng. Nó ngả vàng vì khí quyển tán xạ ánh sáng xanh đi mất — cũng chính là lý do trời có màu xanh.' },
+  { t: 'Người trưởng thành có ít xương hơn trẻ sơ sinh.', d: true, n: 0.30, k: .45, nh: 'BẪY NIỀM TIN',
+    g: 'Đúng. Trẻ sơ sinh khoảng 270 mẩu xương, lớn lên nhiều mẩu dính lại thành một — người lớn còn 206.' },
+  { t: 'Trong một nhóm 23 người, khả năng có hai người trùng ngày sinh là trên 50%.', d: true, n: 0.24, k: .6, nh: 'BẪY NIỀM TIN',
+    g: 'Đúng, 50,7%. Trực giác đếm nhầm: không phải so bạn với 22 người, mà là 253 cặp người so với nhau.' },
+  { t: 'Sao Kim tự quay quanh trục một vòng lâu hơn nó bay hết một vòng quanh Mặt Trời.', d: true, n: 0.28, k: .6, nh: 'BẪY NIỀM TIN',
+    g: 'Đúng. Một vòng tự quay mất 243 ngày Trái Đất, một vòng quanh Mặt Trời chỉ 225 ngày. Nó còn quay ngược chiều so với hầu hết hành tinh khác.' },
+  { t: 'Một ngày trên Trái Đất đang dài dần ra.', d: true, n: 0.30, k: .5, nh: 'BẪY NIỀM TIN',
+    g: 'Đúng. Thuỷ triều do Mặt Trăng gây ra hãm Trái Đất lại, mỗi thế kỷ ngày dài thêm khoảng 1,7 phần nghìn giây. Thời khủng long một ngày chỉ khoảng 23 giờ.' },
+  { t: 'Nhật Bản có hơn một nghìn hòn đảo.', d: true, n: 0.62, k: .3, nh: 'KIẾN THỨC',
+    g: 'Đúng — và nhiều hơn thế rất nhiều. Lần đo lại năm 2023 đếm được 14.125 đảo, gấp đôi con số 6.852 dùng suốt mấy chục năm trước đó.' },
+  { t: 'Tiếng Việt giọng Bắc có sáu thanh điệu.', d: true, n: 0.70, k: .25, nh: 'KIẾN THỨC',
+    g: 'Đúng: ngang, huyền, sắc, hỏi, ngã, nặng. Giọng Nam thường nhập hỏi với ngã nên nghe còn năm.' },
+
+  /* ---- PHA 2 (từ tầng 16): CÂU CỰC KHÓ — user chốt 16/11/2026 ----
+     "Từ 16 trở đi là những câu rất rất khó: AI, lượng tử, kinh tế, xã hội, toán cao cấp."
+     Mỗi câu đã kiểm cho đúng sự thật. `n` đặt theo TRỰC GIÁC của người không biết (có câu
+     trực giác dẫn sai = bẫy), tránh quanh 0,5 vì câu khó mà phòng chia đôi là chết hàng loạt. */
+  { t: 'Kiến trúc Transformer ra đời từ bài báo "Attention Is All You Need" năm 2017.', d: true, n: .62, k: .75, pha: 2, nh: 'AI',
+    g: 'Đúng. Vaswani và cộng sự, 2017.' },
+  { t: 'Trong Transformer gốc, chi phí tính self-attention tăng tuyến tính theo độ dài chuỗi.', d: false, n: .6, k: .9, pha: 2, nh: 'AI',
+    g: 'Sai. Tăng theo BÌNH PHƯƠNG độ dài chuỗi — mỗi vị trí phải so với mọi vị trí khác.' },
+  { t: 'Lan truyền ngược (backpropagation) là một trường hợp của vi phân tự động chế độ ngược.', d: true, n: .38, k: .88, pha: 2, nh: 'AI',
+    g: 'Đúng. Backprop chính là reverse-mode autodiff áp lên mạng nơ-ron.' },
+  { t: 'Hàm kích hoạt ReLU khả vi tại mọi điểm.', d: false, n: .6, k: .8, pha: 2, nh: 'AI',
+    g: 'Sai. ReLU gãy góc tại 0 nên không khả vi ở đó; thực tế người ta gán đạo hàm 0 hoặc 1 tại điểm này.' },
+  { t: 'Mạng một lớp ẩn, đủ nhiều nơ-ron và hàm kích hoạt không phải đa thức, xấp xỉ được mọi hàm liên tục trên tập compact với độ chính xác tuỳ ý.', d: true, n: .38, k: .9, pha: 2, nh: 'AI',
+    g: 'Đúng. Định lý xấp xỉ phổ quát (Cybenko 1989, Hornik 1991, Leshno 1993).' },
+  { t: 'Một perceptron một lớp học được hàm XOR.', d: false, n: .6, k: .8, pha: 2, nh: 'AI',
+    g: 'Sai. XOR không tách được bằng một đường thẳng — Minsky và Papert chỉ ra năm 1969.' },
+  { t: 'Q-learning là thuật toán học tăng cường on-policy.', d: false, n: .6, k: .92, pha: 2, nh: 'AI',
+    g: 'Sai. Q-learning là off-policy: nó học theo hành động tốt nhất, không phải hành động đang làm. SARSA mới là on-policy.' },
+  { t: 'Theo cách dùng chuẩn, dropout chỉ bật khi huấn luyện và tắt khi suy luận.', d: true, n: .4, k: .75, pha: 2, nh: 'AI',
+    g: 'Đúng. Khi suy luận thì dùng toàn bộ mạng; việc bù tỉ lệ đã làm sẵn lúc huấn luyện.' },
+  { t: 'Định lý "No Free Lunch": tính trung bình trên mọi bài toán, không thuật toán học nào tốt hơn thuật toán nào.', d: true, n: .58, k: .85, pha: 2, nh: 'AI',
+    g: 'Đúng. Wolpert và Macready, 1997.' },
+
+  { t: 'Nguyên lý bất định Heisenberg xuất phát từ việc dụng cụ đo làm nhiễu hạt.', d: false, n: .7, k: .85, pha: 2, nh: 'LƯỢNG TỬ',
+    g: 'Sai. Bất định là bản chất của trạng thái lượng tử, có cả khi không đo. "Đo làm nhiễu" là cách giải thích sai rất phổ biến.' },
+  { t: 'Rối lượng tử cho phép truyền thông tin nhanh hơn ánh sáng.', d: false, n: .6, k: .75, pha: 2, nh: 'LƯỢNG TỬ',
+    g: 'Sai. Định lý không truyền tin (no-communication) chặn điều đó: kết quả đo một bên là ngẫu nhiên, bên kia không dùng được để nhận tin.' },
+  { t: 'Một qubit lưu và đọc ra được vô số bit thông tin cổ điển.', d: false, n: .58, k: .92, pha: 2, nh: 'LƯỢNG TỬ',
+    g: 'Sai. Giới hạn Holevo: n qubit chỉ cho đọc ra nhiều nhất n bit cổ điển.' },
+  { t: 'Thuật toán Shor phân tích thừa số nguyên trong thời gian đa thức trên máy tính lượng tử.', d: true, n: .42, k: .85, pha: 2, nh: 'LƯỢNG TỬ',
+    g: 'Đúng. Đó là lý do nó đe doạ mã hoá RSA.' },
+  { t: 'Thuật toán Grover tìm kiếm trong dữ liệu không sắp xếp nhanh hơn máy cổ điển theo cấp số mũ.', d: false, n: .66, k: .9, pha: 2, nh: 'LƯỢNG TỬ',
+    g: 'Sai. Chỉ nhanh hơn BẬC HAI: √N bước thay vì N bước.' },
+  { t: 'Không thể tạo bản sao hoàn hảo của một trạng thái lượng tử bất kỳ chưa biết.', d: true, n: .4, k: .82, pha: 2, nh: 'LƯỢNG TỬ',
+    g: 'Đúng. Định lý không nhân bản (no-cloning), 1982.' },
+  { t: 'Spin của electron là do electron thật sự tự quay quanh trục của nó.', d: false, n: .66, k: .78, pha: 2, nh: 'LƯỢNG TỬ',
+    g: 'Sai. Spin là mô-men động lượng nội tại, không phải chuyển động quay. Nếu là quay thật thì bề mặt electron phải chạy nhanh hơn ánh sáng.' },
+  { t: 'Hằng số Planck rút gọn ħ bằng h chia cho 2π.', d: true, n: .4, k: .72, pha: 2, nh: 'LƯỢNG TỬ',
+    g: 'Đúng. ħ = h / 2π.' },
+
+  { t: 'Một nước kém hiệu quả hơn ở MỌI mặt hàng vẫn có lợi khi tham gia thương mại quốc tế.', d: true, n: .34, k: .78, pha: 2, nh: 'KINH TẾ',
+    g: 'Đúng. Lợi thế so sánh (Ricardo): chỉ cần chi phí cơ hội khác nhau là cả hai bên cùng lợi.' },
+  { t: 'Có những hàng hoá mà khi giá tăng thì lượng cầu cũng tăng.', d: true, n: .3, k: .82, pha: 2, nh: 'KINH TẾ',
+    g: 'Đúng. Hàng Giffen — ví dụ gạo với hộ rất nghèo ở Hồ Nam (Jensen và Miller, 2008).' },
+  { t: 'Theo hiệu ứng Fisher, lạm phát kỳ vọng tăng thì lãi suất danh nghĩa có xu hướng giảm.', d: false, n: .4, k: .85, pha: 2, nh: 'KINH TẾ',
+    g: 'Sai. Lãi suất danh nghĩa TĂNG theo lạm phát kỳ vọng để giữ lãi suất thực.' },
+  { t: 'Đường cong Laffer cho rằng thuế suất 0% và 100% đều cho nguồn thu thuế bằng 0.', d: true, n: .56, k: .72, pha: 2, nh: 'KINH TẾ',
+    g: 'Đúng. 0% thì không thu gì, 100% thì không ai còn lý do làm ra thu nhập chịu thuế.' },
+  { t: 'Hệ số Gini bằng 1 nghĩa là thu nhập được chia hoàn toàn đều.', d: false, n: .58, k: .7, pha: 2, nh: 'KINH TẾ',
+    g: 'Sai. Ngược lại: Gini = 0 là hoàn toàn đều, Gini = 1 là một người giữ hết.' },
+  { t: 'Trong cạnh tranh hoàn hảo, ở cân bằng dài hạn doanh nghiệp có lợi nhuận kinh tế bằng 0.', d: true, n: .34, k: .82, pha: 2, nh: 'KINH TẾ',
+    g: 'Đúng. Còn lời thì doanh nghiệp mới tràn vào cho tới khi hết lời.' },
+  { t: 'Một nước không thể cùng lúc có tỉ giá cố định, tự do dòng vốn và chính sách tiền tệ độc lập.', d: true, n: .58, k: .88, pha: 2, nh: 'KINH TẾ',
+    g: 'Đúng. Bộ ba bất khả thi (Mundell–Fleming): chỉ chọn được hai trong ba.' },
+  { t: 'Cân bằng Nash luôn là kết quả tốt nhất cho tất cả người chơi.', d: false, n: .58, k: .72, pha: 2, nh: 'KINH TẾ',
+    g: 'Sai. Song đề tù nhân: cân bằng Nash là cả hai cùng khai, tệ hơn cho cả hai so với cùng im lặng.' },
+
+  { t: 'Càng nhiều người chứng kiến một vụ việc thì MỖI người càng ít khả năng ra tay giúp.', d: true, n: .36, k: .7, pha: 2, nh: 'XÃ HỘI',
+    g: 'Đúng. Hiệu ứng người ngoài cuộc (Darley và Latané, 1968): trách nhiệm bị chia mỏng ra.' },
+  { t: 'Một xu hướng đúng trong TỪNG nhóm có thể đảo ngược khi gộp các nhóm lại.', d: true, n: .34, k: .88, pha: 2, nh: 'XÃ HỘI',
+    g: 'Đúng. Nghịch lý Simpson.' },
+  { t: 'Khi một chỉ số trở thành mục tiêu, nó không còn là chỉ số đo tốt nữa.', d: true, n: .58, k: .75, pha: 2, nh: 'XÃ HỘI',
+    g: 'Đúng. Định luật Goodhart.' },
+  { t: 'Theo Liên Hợp Quốc, dân số thế giới chạm 8 tỉ người vào năm 2022.', d: true, n: .56, k: .65, pha: 2, nh: 'XÃ HỘI',
+    g: 'Đúng. Mốc 15/11/2022.' },
+  { t: 'Với từ ba lựa chọn trở lên, không có cách bỏ phiếu xếp hạng nào thoả cùng lúc mọi tiêu chí công bằng của Arrow.', d: true, n: .38, k: .92, pha: 2, nh: 'XÃ HỘI',
+    g: 'Đúng. Định lý bất khả thi Arrow, 1951.' },
+
+  { t: 'Tập số hữu tỉ là tập đếm được.', d: true, n: .34, k: .82, pha: 2, nh: 'TOÁN CAO CẤP',
+    g: 'Đúng. Xếp được thành một dãy (Cantor), dù giữa hai số hữu tỉ nào cũng có vô số số hữu tỉ khác.' },
+  { t: 'Số điểm trên đoạn [0, 1] bằng đúng số điểm trên cả trục số thực.', d: true, n: .3, k: .88, pha: 2, nh: 'TOÁN CAO CẤP',
+    g: 'Đúng. Có song ánh giữa (0, 1) và ℝ, ví dụ x ↦ tan(π(x − ½)).' },
+  { t: 'Chuỗi 1 + 1/2 + 1/3 + 1/4 + … hội tụ về một số hữu hạn.', d: false, n: .58, k: .75, pha: 2, nh: 'TOÁN CAO CẤP',
+    g: 'Sai. Chuỗi điều hoà phân kỳ — lớn dần tới vô cùng, chỉ là rất chậm.' },
+  { t: 'e^(iπ) + 1 = 0.', d: true, n: .56, k: .7, pha: 2, nh: 'TOÁN CAO CẤP',
+    g: 'Đúng. Đồng nhất thức Euler.' },
+  { t: 'Mọi hàm liên tục đều khả vi.', d: false, n: .58, k: .78, pha: 2, nh: 'TOÁN CAO CẤP',
+    g: 'Sai. Hàm |x| liên tục nhưng không khả vi tại 0; hàm Weierstrass liên tục mà không khả vi ở đâu cả.' },
+  { t: 'Mọi hàm khả vi đều liên tục.', d: true, n: .58, k: .72, pha: 2, nh: 'TOÁN CAO CẤP',
+    g: 'Đúng. Khả vi tại một điểm kéo theo liên tục tại điểm đó.' },
+  { t: 'Trong mọi hệ tiên đề nhất quán đủ mạnh để chứa số học, có mệnh đề đúng mà hệ đó không chứng minh được.', d: true, n: .4, k: .92, pha: 2, nh: 'TOÁN CAO CẤP',
+    g: 'Đúng. Định lý bất toàn thứ nhất của Gödel, 1931.' },
+  { t: 'Ma trận vuông có định thức bằng 0 thì khả nghịch.', d: false, n: .4, k: .65, pha: 2, nh: 'TOÁN CAO CẤP',
+    g: 'Sai. Định thức bằng 0 thì KHÔNG khả nghịch.' },
+  { t: 'Tích phân của e^(−x²) trên toàn trục số thực bằng √π.', d: true, n: .4, k: .92, pha: 2, nh: 'TOÁN CAO CẤP',
+    g: 'Đúng. Tích phân Gauss.' },
+  { t: 'Giả thuyết Riemann đã được chứng minh.', d: false, n: .42, k: .8, pha: 2, nh: 'TOÁN CAO CẤP',
+    g: 'Sai. Vẫn là bài toán mở, nằm trong 7 Bài toán Thiên niên kỷ.' },
+  { t: 'Chỉ có đúng 5 khối đa diện đều.', d: true, n: .4, k: .72, pha: 2, nh: 'TOÁN CAO CẤP',
+    g: 'Đúng. Năm khối Platon: tứ diện, lập phương, bát diện, thập nhị diện, nhị thập diện.' },
+  { t: 'Định lý lớn Fermat đã được chứng minh.', d: true, n: .56, k: .62, pha: 2, nh: 'TOÁN CAO CẤP',
+    g: 'Đúng. Andrew Wiles, công bố bản hoàn chỉnh năm 1995.' },
+  { t: 'Đã chứng minh được: mọi số chẵn lớn hơn 2 đều là tổng của hai số nguyên tố.', d: false, n: .58, k: .88, pha: 2, nh: 'TOÁN CAO CẤP',
+    g: 'Sai. Đó là giả thuyết Goldbach — kiểm bằng máy tới rất lớn nhưng chưa ai chứng minh.' },
+
+  /* ---- (cũ) PHA 2: vùng không xác định — đã cất, xem dưới ---- */
+  { t: 'Câu này là sai.', d: false, n: 0.7, k: .8, pha: 2, nh: 'KHÔNG XÁC ĐỊNH',
+    g: 'SAI — theo luật vùng không xác định: mệnh đề tự mâu thuẫn được tính là SAI. Luật này được công bố trước khi bạn vào thang.' },
+  { t: 'Nếu bạn trả lời ĐÚNG cho câu này, bạn sẽ lên tầng.', d: false, n: 0.72, k: .7, pha: 2, nh: 'KHÔNG XÁC ĐỊNH',
+    g: 'SAI. Không kiểm chứng được bên trong thang máy (còn tùy đám đông chọn gì) → tính là SAI.' },
+  { t: 'Một chiếc đồng hồ chết vẫn chỉ đúng giờ hai lần mỗi ngày.', d: true, n: 0.78, k: .4, pha: 2, nh: 'KHÔNG XÁC ĐỊNH',
+    g: 'Đúng, với mặt đồng hồ 12 giờ: kim đứng yên trùng giờ thật hai lần trong 24 tiếng.' },
+  { t: 'Nếu tất cả mọi người đều tin một điều sai, điều đó trở thành đúng.', d: false, n: 0.12, k: .2, pha: 2, nh: 'KHÔNG XÁC ĐỊNH',
+    g: 'Sai. Niềm tin của đám đông đổi được kết quả của bạn trong thang máy này, nhưng không đổi được sự thật.' },
+  { t: 'Một quy tắc bị phá vỡ mà không ai biết thì quy tắc đó vẫn còn tồn tại.', d: true, n: 0.78, k: .6, pha: 2, nh: 'KHÔNG XÁC ĐỊNH',
+    g: 'Đúng. Theo hồ sơ: quy tắc tồn tại cho tới khi bị gỡ khỏi sổ tay. Không ai biết thì không gỡ được.' },
+  { t: 'Con số 20 lớn hơn con số 13.', d: true, n: 0.93, k: .05, pha: 2, nh: 'KHÔNG XÁC ĐỊNH',
+    g: 'Đúng. Vùng không xác định không làm số học sai đi. Ai nghĩ quá nhiều thì tự đi xuống.' },
+  { t: 'Nước vẫn sôi ở 100°C ngay cả bên trong thang máy này.', d: true, n: 0.86, k: .3, pha: 2, nh: 'KHÔNG XÁC ĐỊNH',
+    g: 'Đúng. Áp suất trong cabin vẫn là áp suất thường.' },
+  { t: 'Bạn đang đứng trên một tầng không có trên bảng nút.', d: function(tt){ return tt.tangBan === TANG_KHONG_CO; }, n: 0.3, k: .6, pha: 2, nh: 'KHÔNG XÁC ĐỊNH',
+    g: function(tt){ return tt.tangBan === TANG_KHONG_CO
+        ? 'Đúng. Bạn đang ở tầng 13 — tầng duy nhất không có nút. Hồ sơ không ghi nhận nó tồn tại.'
+        : 'Sai. Bạn đang ở tầng ' + tt.tangBan + ', nút tầng đó có trên bảng. Chỉ tầng 13 là không.'; } },
+  { t: 'Vòng vừa rồi, đa số đã chọn sai.', d: function(tt){ return tt.daSoSaiVongTruoc; }, n: 0.25, k: .55, pha: 2, nh: 'KHÔNG XÁC ĐỊNH',
+    g: function(tt){ return tt.daSoSaiVongTruoc
+        ? 'Đúng. Vòng trước đa số chọn sai — đó là lý do có người được +3.'
+        : 'Sai. Vòng trước đa số chọn đúng.'; } },
+  { t: 'Trong thang máy này hiện còn ít hơn 6 người.', d: function(tt){ return tt.conSong < 6; }, n: 0.3, k: .4, pha: 2, nh: 'KHÔNG XÁC ĐỊNH',
+    g: function(tt){ return 'Hiện còn ' + tt.conSong + ' người. Bảng bên dưới luôn nói thật — câu này chỉ hỏi bạn có chịu nhìn không.'; } },
+  { t: 'Người đang ở tầng cao nhất lúc này không phải là bạn.', d: function(tt){ return !tt.banDanDau; }, n: 0.72, k: .45, pha: 2, nh: 'KHÔNG XÁC ĐỊNH',
+    g: function(tt){ return tt.banDanDau
+        ? 'Sai. Bạn đang là người cao nhất (hoặc đồng hạng cao nhất).'
+        : 'Đúng. Có người đang ở trên bạn.'; } },
+  { t: 'Có thể cùng lúc vừa ở tầng 12 vừa ở tầng 14.', d: false, n: 0.1, k: .3, pha: 2, nh: 'KHÔNG XÁC ĐỊNH',
+    g: 'Sai. Mỗi người có đúng một tầng. Cái không tồn tại là tầng 13, không phải phép đếm.' },
+  { t: 'Im lặng cũng là một câu trả lời hợp lệ.', d: false, n: 0.68, k: .4, pha: 2, nh: 'KHÔNG XÁC ĐỊNH',
+    g: 'Sai. Theo luật: hết giờ mà không chọn thì bị trừ 2 tầng và không được tính vào đa số. Đó là bị phạt, không phải lựa chọn.' },
+  { t: 'Mọi câu hỏi trong thang máy này đều có một đáp án xác định trước.', d: true, n: 0.28, k: .5, pha: 2, nh: 'KHÔNG XÁC ĐỊNH',
+    g: 'Đúng. Kể cả câu vô lý nhất cũng có đáp án định sẵn theo luật vùng không xác định. Thang máy không bịa đáp án sau khi bạn chọn.' },
+  { t: 'Nếu không ai bị loại trong một vòng thì vòng đó cả phòng đã chọn giống nhau.', d: false, n: 0.74, k: .7, pha: 2, nh: 'KHÔNG XÁC ĐỊNH',
+    g: 'Sai. Không ai bị loại cũng xảy ra khi ĐA SỐ CHỌN SAI (thiểu số đúng được +3) hoặc khi hòa phiếu.' }
+];
+CAU_CO_DINH.forEach(function(q, i){ q.id = i; if (!q.pha) q.pha = 1; });
+/* Câu nghịch lý 'KHÔNG XÁC ĐỊNH' cũ: cất đi (pha 9 = không bao giờ rút) vì từ tầng 16 giờ
+   chỉ còn câu cực khó. Muốn dùng lại thì bỏ dòng này. */
+CAU_CO_DINH.forEach(function(q){ if (q.nh === 'KHÔNG XÁC ĐỊNH') q.pha = 9; });
+var CAU_HOI = CAU_CO_DINH.slice();   /* gộp thêm câu hồ sơ mỗi ván — ganCauVan() */
+
+/* ---------------------------------------------------------------- NGƯỜI MÁY
+   biet    : nền kiến thức, xác suất biết đáp án thật
+   theoDam : khi không chắc thì bám đám đông mạnh tới đâu
+   lieu    : khi tin chắc mình đúng mà ngược đám đông, dám đi một mình tới đâu
+   doc     : đã đọc hồ sơ kỹ tới đâu (chỉ ảnh hưởng câu HỒ SƠ)                    */
+/* theoDam ai cũng cao: trong luật này đi một mình mà sai là CHẾT, nên bản năng đúng
+   của mọi người là co về phía đông người. Ai cũng dám đi riêng thì phòng vỡ đôi mỗi
+   vòng và chết sạch sau 5 vòng — đã đo và hỏng đúng như vậy. */
+var MAU_MAY = [
+  { ten: 'QUẠ', biet: .88, theoDam: .45, lieu: .80, doc: .9 },
+  { ten: 'CÚ',  biet: .74, theoDam: .88, lieu: .18, doc: .7 },
+  { ten: 'CÁO', biet: .68, theoDam: .55, lieu: .88, doc: .5 },
+  { ten: 'RẮN', biet: .60, theoDam: .95, lieu: .10, doc: .3 },
+  { ten: 'GẤU', biet: .80, theoDam: .78, lieu: .30, doc: .5 },
+  { ten: 'HẠC', biet: .70, theoDam: .64, lieu: .60, doc: 1.0 },
+  { ten: 'MỐI', biet: .45, theoDam: .75, lieu: .40, doc: .2 }
+];
+/* 7 con + bạn = 8 người (user chốt 14/11/2026: tối đa 8 người).
+   Bỏ NHỆN (trùng vai GẤU), CHUỘT (trùng RẮN), DƠI (trùng CÁO nhưng dốt hơn nên chết
+   gần như chắc chắn — trong phòng 8 người mất một mạng đau hơn phòng 11 người).
+   Trung bình biet 0,693 và theoDam 0,714 — gần y nguyên bộ 10 con cũ (0,688 / 0,703):
+   cắt người nhưng KHÔNG đổi trình độ trung bình của đám đông. */
+
+/* HAI con số khác nhau, đừng gộp lại:
+   TANG_KHONG_CO = 13 — tầng KHÔNG CÓ TRÊN BẢNG NÚT. Đây là chi tiết trong hồ sơ
+     (sổ tay: sau nút 12 là nút 14; nhật ký bảo vệ: có người bấm nút đó). Nhiều câu
+     hỏi dựa vào nó. Trên tháp nó là vạch đỏ.
+   TANG_UNKNOWN = 16 — mốc ĐỔI PHA sang vùng không xác định (user chốt 15/11/2026).
+     Trước hai cái này là một, nhưng từ khi xuất phát ở tầng 10 thì một lần +3 là chạm
+     13 ngay — pha 1 (nơi chứa toàn bộ câu nhóm HỒ SƠ) chỉ còn ~2 vòng. Đo được: 16 đưa
+     pha 2 về vòng 3,5, giữ đúng tỉ lệ 2/3 như hồi xuất phát tầng 0. */
+var TANG_DICH = 20, TANG_KHONG_CO = 13, TANG_UNKNOWN = 16, GIAY_DOC = 90, GIAY_HOI = 105;   /* 1 phút 45 để thảo luận — user chốt 15/11/2026 */
+/* Ai cũng vào thang ở TẦNG 10 (user chốt 15/11/2026), không phải tầng 0:
+   có 10 tầng để leo và 10 tầng để rơi, nên −2 đau ngay từ vòng đầu chứ không bị
+   sàn tầng 0 đỡ cho. Đổi số này là đổi độ dài trận — xem bảng đo trong tài liệu. */
+var TANG_BAT_DAU = 5;    /* user đổi 10 → 5 ngày 16/11/2026: leo 15 tầng, rơi 5 tầng */
+
+/* Mức khó KHÔNG đụng vào luật tính tầng — chỉ đổi mức hiểu biết của 10 người máy.
+   Máy càng dốt thì đám đông càng hay sai, mà đám đông sai là vòng đó KHÔNG AI BỊ LOẠI
+   (thiểu số lúc đó đang đúng) — nên mức Dễ vừa dễ ăn +3 vừa ít chết. */
+var CAP_MAY = {
+  de:     { ten: 'Dễ',     hinh: '🌙', he: 0.80, mo: 'đám đông hay nhầm' },
+  thuong: { ten: 'Thường', hinh: '🛗', he: 1.00, mo: 'như người thật' },
+  kho:    { ten: 'Khó',    hinh: '💀', he: 1.14, mo: 'đám đông tỉnh táo' }
+};
+var capMay = CAP_MAY.thuong;
+
+/* =====================================================================
+   HỒ SƠ SINH MỚI MỖI VÁN (user chốt 15/11/2026)
+   "Phòng tài liệu nhiều thông tin hơn, thông tin đổi qua các màn, nhiều tới mức
+    phải hợp sức mới nhớ nổi." → mỗi ván một toà nhà khác: số thang, thang hỏng,
+   ca trực, giờ khoá cửa, mã cửa, tầng phòng máy... đều quay số lại. 12 tờ, hơn
+   30 dòng, nằm ở 6 chỗ trong phòng (mỗi chỗ 2 tờ). 90 giây không đọc hết được.
+
+   MỌI MÂU THUẪN ĐỀU CÓ ĐÁP ÁN XÁC ĐỊNH theo tờ QUY TẮC (4 luật). Thêm sự kiện mới
+   thì phải tự kiểm: hai tờ cãi nhau có luật nào phân xử không. Không có thì đừng thêm.
+   ===================================================================== */
+var TU = [];          /* 6 chỗ trong phòng, mỗi chỗ { ten, to: [2 tờ] } */
+var CAU_HS = [];      /* câu hỏi sinh từ hồ sơ của ván này */
+
+function hsNN(a, b){ return a + Math.floor(Math.random() * (b - a + 1)); }
+function hsLay(a){ return a[Math.floor(Math.random() * a.length)]; }
+function hsXao(a){
+  a = a.slice();
+  for (var i = a.length - 1; i > 0; i--){ var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; }
+  return a;
+}
+function hsMa(){ return String(hsNN(1000, 9999)); }
+
+function taoHoSo(){
+  var N = hsNN(4, 6), K = hsNN(2, N), C = hsNN(5, 8);
+  var H1 = hsNN(21, 22), H2 = H1 + hsNN(1, 2);
+  var A = hsMa(), B = hsMa(); while (B === A) B = hsMa();
+  var P = hsLay([3, 4, 5, 6, 8]);                    /* P+2 không được trùng tầng 9 */
+  var E = hsLay([4, 7, 14, 18]); while (E === P) E = hsLay([4, 7, 14, 18]);
+  var ten = hsXao(['anh Tùng', 'chị Hạnh', 'anh Phát', 'chị Ngọc', 'anh Lâm', 'chị Vy', 'anh Khoa', 'chị Trâm']);
+  var X = ten[0], Y = ten[1];
+  var mon = hsXao(['cơm gà', 'bún bò', 'phở bò', 'cơm sườn', 'mì xào', 'bánh canh', 'cơm cá', 'hủ tiếu']);
+  var G = hsNN(9, 11), CAM = hsNN(5, 9);
+  var soNguoi = MAU_MAY.length + 1;
+
+  TU = [
+    { ten: 'BỤC QUY TẮC', to: [
+      { ten: 'QUY TẮC ĐỌC HỒ SƠ', ngay: 'không ghi ngày', dau: true, noi: [
+        '<b>1.</b> Tờ <b>có dấu</b> thắng tờ không dấu, kể cả khi tờ không dấu mới hơn.',
+        '<b>2.</b> Hai tờ <b>cùng loại</b>: bản mới hơn thắng.',
+        '<b>3.</b> Tờ có dấu ghi <b>"thay thế"</b> thì thắng phần nó thay thế.',
+        '<b>4.</b> <b>Sự việc đã xảy ra</b> (biên bản) xoá hiệu lực mọi thông báo trước đó cùng chủ đề.',
+        'Điều gì không có trong hồ sơ thì không tồn tại trong toà nhà.' ] },
+      { ten: 'SƠ ĐỒ TOÀ NHÀ', ngay: 'bản 01/03', dau: true, noi: [
+        'Phòng máy phát điện: <b>tầng ' + P + '</b>.',
+        'Căng tin: <b>tầng 2</b>.',
+        'Bảng nút <b>không có tầng 13</b> và <b>không có tầng ' + E + '</b>.',
+        'Tầng 1: sảnh và phòng lưu hồ sơ.' ] } ] },
+    { ten: 'TỦ VẬN HÀNH', to: [
+      { ten: 'SỔ TAY VẬN HÀNH', ngay: 'bản in 03/04', dau: true, noi: [
+        'Toà nhà có <b>' + N + ' thang máy</b>, đánh số 1 đến ' + N + '.',
+        'Trần tải mỗi cabin: <b>11 người</b>.',
+        'Báo động cấp 2: thang <b>chỉ dừng ở tầng chẵn</b>.',
+        'Cửa chính khoá lúc <b>' + H1 + ':00</b>.',
+        'Sau 20:00, <b>thang số 1 chỉ chở hàng</b>.' ] },
+      { ten: 'LỊCH BẢO TRÌ', ngay: '14/06', dau: true, noi: [
+        '05/06: <b>đổi mã cửa thoát hiểm</b> từ ' + A + ' sang <b>' + B + '</b>.',
+        '14/06: <b>thay mới camera tầng 9</b>.',
+        'Thang số ' + K + ': ngưng bảo trì, chờ biên bản.' ] } ] },
+    { ten: 'BẢNG THÔNG BÁO', to: [
+      { ten: 'THÔNG BÁO BAN QUẢN LÝ', ngay: '15/05', dau: true, noi: [
+        '<b>Thay thế</b> mục giờ khoá cửa trong sổ tay: từ nay khoá lúc <b>' + H2 + ':00</b>.',
+        'Cấm hút thuốc trong cabin.' ] },
+      { ten: 'THÔNG BÁO NỘI BỘ', ngay: '11/06', dau: false, noi: [
+        'Thang <b>số ' + K + ' đã sửa xong</b>, chạy lại từ hôm nay.',
+        'Ca trực đêm <b>giảm còn ' + (C - 2) + ' người</b> kể từ tháng này.',
+        'Đề nghị không bàn tán về tiếng động ở lồng thang ban đêm.' ] } ] },
+    { ten: 'BÀN SỰ CỐ', to: [
+      { ten: 'BIÊN BẢN SỰ CỐ', ngay: '12/06', dau: true, noi: [
+        '12/06: thang <b>số ' + K + ' kẹt ở tầng 9</b>, đã <b>niêm phong vô thời hạn</b>.',
+        'Trong lúc kẹt, <b>đèn báo tầng 13 sáng</b> suốt 40 phút.',
+        'Không giải thích được. Chưa ai ký xác nhận phần này.' ] },
+      { ten: 'BÁO CÁO CAMERA', ngay: '13/06', dau: false, noi: [
+        '<b>Camera tầng 9 hỏng</b> từ hôm sự cố.',
+        'Camera tầng ' + (P + 2) + ' (<b>phòng máy phát</b>) mất tín hiệu.',
+        'Camera sảnh ghi được <b>' + CAM + ' người</b> vào sau giờ khoá cửa.' ] } ] },
+    { ten: 'BÀN BẢO VỆ', to: [
+      { ten: 'DANH SÁCH CA TRỰC', ngay: '02/06', dau: true, noi: [
+        'Ca trực đêm: <b>' + C + ' người</b>.',
+        'Trưởng ca: <b>' + X + '</b>.' ] },
+      { ten: 'NHẬT KÝ BẢO VỆ', ngay: '10/06', dau: false, noi: [
+        'Đêm 09/06 tôi đếm được <b>' + (C - 1) + ' người</b> trong ca.',
+        '<b>Có người bấm nút tầng 13.</b> Nút đó không có trên bảng.',
+        Y.charAt(0).toUpperCase() + Y.slice(1) + ' nói sẽ thay ' + X + ' làm trưởng ca.' ] } ] },
+    { ten: 'BÀN CĂNG TIN', to: [
+      { ten: 'THỰC ĐƠN CĂNG TIN', ngay: 'tuần này', dau: false, noi: [
+        'Thứ hai: ' + mon[0] + '. Thứ ba: ' + mon[1] + '. Thứ tư: <b>' + mon[2] + '</b>. Thứ năm: ' +
+          mon[3] + '. Thứ sáu: ' + mon[4] + '.',
+        'Căng tin ở <b>tầng 3</b>. Không phục vụ ca đêm.',
+        'Bánh mì hết lúc <b>' + G + ' giờ</b>.' ] },
+      { ten: 'GIẤY NHẮN', ngay: 'không ngày', dau: false, noi: [
+        'Mã cửa thoát hiểm là <b>' + A + '</b> — đừng quên!',
+        'Ai lấy cái ô đen ở tầng 5 thì trả lại.' ] } ] }
+  ];
+  TAI_LIEU = [];
+  TU.forEach(function(t, i){ t.to.forEach(function(d){ d.tram = i; TAI_LIEU.push(d); }); });
+
+  /* nguon = phải đọc HẾT các chỗ này mới biết sự thật;
+     bay   = đọc chỗ này mà thiếu nguon thì tin nhầm.
+     noiDung / noiBay = câu người máy nói trong lúc thảo luận. */
+  function Q(t, d, n, k, nguon, bay, noiDung, noiBay, g, pha){
+    return { t: t, d: d, n: n, k: k, nh: 'HỒ SƠ', tl: true, hs: true, nguon: nguon, bay: bay,
+             noiDung: noiDung, noiBay: noiBay || '', g: g, pha: pha || 1 };
+  }
+  var dsQ = [
+    Q('Toà nhà có ' + N + ' thang máy.', true, .62, .3, [1], [],
+      'Sổ tay vận hành ghi ' + N + ' thang.', '',
+      'Đúng. Sổ tay vận hành (có dấu) ghi ' + N + ' thang, không tờ nào cãi lại con số tổng.'),
+    Q('Hiện có ' + (N - 1) + ' thang máy đang chạy.', true, .25, .65, [1, 3], [2],
+      'Sổ tay ghi ' + N + ' thang, mà biên bản 12/06 niêm phong thang số ' + K + ' — còn ' + (N - 1) + '.',
+      'Thông báo nội bộ bảo thang số ' + K + ' sửa xong rồi, vậy đủ ' + N + ' thang chạy.',
+      'Đúng. ' + N + ' thang theo sổ tay, trừ thang số ' + K + ' bị niêm phong theo biên bản 12/06. Thông báo nội bộ 11/06 nói thang ' + K + ' chạy lại — nhưng biên bản là sự việc xảy ra SAU, lại có dấu.'),
+    Q('Thang số ' + K + ' đang chạy bình thường.', false, .62, .55, [3], [2],
+      'Biên bản 12/06 ghi thang số ' + K + ' kẹt, niêm phong vô thời hạn.',
+      'Thông báo nội bộ ghi thang số ' + K + ' sửa xong, chạy lại rồi mà.',
+      'Sai. Thông báo 11/06 (không dấu) bảo sửa xong, nhưng biên bản 12/06 (có dấu, xảy ra sau) ghi kẹt và niêm phong. Luật 4: sự việc đã xảy ra xoá thông báo trước đó.'),
+    Q('Khi có báo động cấp 2, thang chỉ dừng ở tầng chẵn.', true, .72, .3, [1], [],
+      'Sổ tay ghi đúng vậy: báo động cấp 2 chỉ dừng tầng chẵn.', '',
+      'Đúng. Ghi thẳng trong sổ tay vận hành.'),
+    Q('Trần tải mỗi cabin lớn hơn số người có mặt lúc trận bắt đầu.', 11 > soNguoi, .35, .6, [1], [],
+      'Sổ tay ghi trần tải 11 người. Mình có ' + soNguoi + ' người.', '',
+      (11 > soNguoi ? 'Đúng' : 'Sai') + '. Sổ tay ghi 11, trận này bắt đầu với ' + soNguoi + ' người.'),
+    Q('Sau 20 giờ, thang số 1 chỉ chở hàng.', true, .4, .45, [1], [],
+      'Sổ tay có dòng: sau 20:00 thang số 1 chỉ chở hàng.', '',
+      'Đúng. Dòng cuối của sổ tay vận hành.'),
+    hsLay([
+      Q('Ca trực đêm có ' + C + ' người.', true, .3, .7, [4], [2],
+        'Danh sách ca trực có dấu ghi ' + C + ' người.',
+        'Thông báo nội bộ ghi giảm còn ' + (C - 2) + ' người.',
+        'Đúng. Danh sách ca trực (có dấu) ghi ' + C + '. Thông báo nội bộ ghi ' + (C - 2) + ' và nhật ký đếm ' + (C - 1) + ' — cả hai đều KHÔNG dấu. Luật 1.'),
+      Q('Ca trực đêm hiện có ' + (C - 2) + ' người.', false, .6, .6, [4], [2],
+        'Danh sách ca trực có dấu ghi ' + C + ' người.',
+        'Thông báo nội bộ ghi giảm còn ' + (C - 2) + ' người.',
+        'Sai. ' + (C - 2) + ' là số của thông báo nội bộ KHÔNG dấu. Danh sách ca trực có dấu ghi ' + C + '. Luật 1.') ]),
+    Q('Trưởng ca đêm là ' + X + '.', true, .4, .5, [4], [],
+      'Danh sách ca trực ghi trưởng ca là ' + X + '.',
+      'Nhật ký bảo vệ ghi ' + Y + ' thay ' + X + ' rồi.',
+      'Đúng. Danh sách có dấu ghi ' + X + '. Nhật ký (không dấu) chỉ ghi ' + Y + ' "nói sẽ" thay — chưa phải sự việc.'),
+    Q('Theo hồ sơ, chưa từng có ai bấm nút tầng 13.', false, .68, .5, [4], [],
+      'Nhật ký bảo vệ ghi có người bấm nút tầng 13.', '',
+      'Sai. Nhật ký bảo vệ ghi rõ có người bấm. Nút không có trên bảng, nhưng việc bấm thì có ghi.'),
+    hsLay([
+      Q('Cửa chính khoá lúc ' + H2 + ' giờ.', true, .34, .6, [2], [1],
+        'Thông báo ban quản lý có dấu, ghi rõ thay thế giờ khoá: ' + H2 + ' giờ.',
+        'Sổ tay vận hành ghi khoá cửa lúc ' + H1 + ' giờ.',
+        'Đúng. Sổ tay ghi ' + H1 + ' giờ, nhưng thông báo ban quản lý (có dấu) ghi THAY THẾ: ' + H2 + ' giờ. Luật 3.'),
+      Q('Cửa chính khoá lúc ' + H1 + ' giờ.', false, .62, .55, [2], [1],
+        'Thông báo ban quản lý có dấu, ghi rõ thay thế giờ khoá: ' + H2 + ' giờ.',
+        'Sổ tay vận hành ghi khoá cửa lúc ' + H1 + ' giờ.',
+        'Sai. ' + H1 + ' giờ là của sổ tay — đã bị thông báo ban quản lý có dấu THAY THẾ bằng ' + H2 + ' giờ. Luật 3.') ]),
+    hsLay([
+      Q('Mã cửa thoát hiểm hiện là ' + B + '.', true, .3, .7, [1], [5],
+        'Lịch bảo trì ghi 05/06 đổi mã sang ' + B + '.',
+        'Giấy nhắn ở căng tin ghi mã là ' + A + '.',
+        'Đúng. Lịch bảo trì (có dấu) ghi đổi từ ' + A + ' sang ' + B + '. Giấy nhắn không dấu vẫn ghi mã cũ.'),
+      Q('Mã cửa thoát hiểm hiện là ' + A + '.', false, .6, .6, [1], [5],
+        'Lịch bảo trì ghi 05/06 đổi mã sang ' + B + '.',
+        'Giấy nhắn ở căng tin ghi mã là ' + A + '.',
+        'Sai. ' + A + ' là mã CŨ, chỉ còn trên giấy nhắn không dấu. Lịch bảo trì có dấu ghi đã đổi sang ' + B + '.') ]),
+    Q('Phòng máy phát điện ở tầng ' + P + '.', true, .38, .5, [0], [3],
+      'Sơ đồ toà nhà ghi phòng máy phát ở tầng ' + P + '.',
+      'Báo cáo camera nói phòng máy phát ở tầng ' + (P + 2) + '.',
+      'Đúng. Sơ đồ (có dấu) ghi tầng ' + P + '. Báo cáo camera không dấu ghi nhầm tầng ' + (P + 2) + '.'),
+    Q('Bảng nút không có tầng ' + E + '.', true, .25, .6, [0], [],
+      'Sơ đồ ghi bảng nút không có tầng 13 và không có tầng ' + E + '.', '',
+      'Đúng. Sơ đồ toà nhà ghi hai tầng không có nút: 13 và ' + E + '.'),
+    Q('Chỉ có đúng một tầng không có nút trên bảng.', false, .66, .6, [0], [],
+      'Sơ đồ ghi HAI tầng không có nút: 13 và ' + E + '.', '',
+      'Sai. Ai cũng nhớ tầng 13, nhưng sơ đồ còn ghi tầng ' + E + '.'),
+    Q('Camera tầng 9 đang hỏng.', false, .6, .55, [1], [3],
+      'Lịch bảo trì ghi 14/06 đã thay mới camera tầng 9.',
+      'Báo cáo camera ghi camera tầng 9 hỏng.',
+      'Sai. Báo cáo camera 13/06 (không dấu) ghi hỏng, nhưng lịch bảo trì 14/06 (có dấu, mới hơn) ghi đã thay mới.'),
+    Q('Căng tin nằm ở tầng 2.', true, .36, .5, [0], [5],
+      'Sơ đồ toà nhà có dấu ghi căng tin tầng 2.',
+      'Thực đơn ghi căng tin ở tầng 3.',
+      'Đúng. Sơ đồ có dấu ghi tầng 2. Thực đơn không dấu ghi tầng 3. Luật 1.'),
+    hsLay([
+      Q('Thứ tư căng tin bán ' + mon[2] + '.', true, .3, .5, [5], [],
+        'Thực đơn ghi thứ tư là ' + mon[2] + '.', '',
+        'Đúng. Thực đơn: thứ tư ' + mon[2] + '. Tờ "giấy lộn" mà có câu hỏi.'),
+      Q('Thứ sáu căng tin bán ' + mon[2] + '.', false, .38, .5, [5], [],
+        'Thực đơn: ' + mon[2] + ' là thứ tư, thứ sáu là ' + mon[4] + '.', '',
+        'Sai. ' + mon[2] + ' là thứ tư. Thứ sáu là ' + mon[4] + '.') ]),
+    Q('Camera sảnh ghi được ' + CAM + ' người vào sau giờ khoá cửa.', true, .35, .55, [3], [],
+      'Báo cáo camera ghi ' + CAM + ' người vào sau giờ khoá cửa.', '',
+      'Đúng. Báo cáo camera không dấu, nhưng không tờ nào cãi lại — mà điều có trong hồ sơ thì tồn tại.'),
+    Q('Đèn báo tầng 13 từng sáng trong lúc thang số ' + K + ' kẹt.', true, .3, .5, [3], [],
+      'Biên bản sự cố ghi đèn tầng 13 sáng suốt 40 phút.', '',
+      'Đúng. Biên bản 12/06: thang số ' + K + ' kẹt ở tầng 9, đèn tầng 13 sáng 40 phút.'),
+    Q('Bánh mì ở căng tin hết lúc ' + G + ' giờ.', true, .35, .5, [5], [],
+      'Thực đơn ghi bánh mì hết lúc ' + G + ' giờ.', '',
+      'Đúng. Dòng cuối thực đơn căng tin.')
+  ];
+  CAU_HS = dsQ;
+  return dsQ;
+}
+
+/* gộp câu cố định + câu hồ sơ ván này, đánh lại id */
+function ganCauVan(){
+  CAU_HOI = CAU_CO_DINH.concat(CAU_HS);
+  CAU_HOI.forEach(function(q, i){ q.id = i; if (!q.pha) q.pha = 1; });
+}
+
+/* ở pha 1, nửa số vòng rút từ câu hồ sơ — hồ sơ giờ dày, phải có đất dụng võ */
+function rutCau(ds0, daRa0, pha0){
+  var hs = ds0.filter(function(q){ return q.pha === pha0 && q.hs && !daRa0[q.id]; });
+  var thuong = ds0.filter(function(q){ return q.pha === pha0 && !q.hs && !daRa0[q.id]; });
+  var kho = (pha0 === 1 && hs.length && Math.random() < .5) ? hs : thuong.concat(hs);
+  if (!kho.length){
+    ds0.forEach(function(q){ if (q.pha === pha0) delete daRa0[q.id]; });
+    kho = ds0.filter(function(q){ return q.pha === pha0; });
+  }
+  return kho[Math.floor(Math.random() * kho.length)];
+}
+
+/* =====================================================================
+   BẢNG CHAT — 1 phút 45 thảo luận trước khi khoá
+   Người máy kể lại thứ chúng ĐÃ ĐỌC trong phòng (đọc đúng tờ thì nói đúng, chỉ đọc
+   tờ bẫy thì nói theo tờ bẫy, không đọc thì nói thật là không đọc). Bạn hỏi được
+   "ai đọc chỗ X" và tuyên bố mình chọn gì — tuyên bố CÔNG KHAI, khác lá phiếu KÍN,
+   nên nói dối được. Người máy hay theo đám đông có thể nghe theo bạn; theo bạn mà
+   sai thì lần sau nó bớt tin bạn (`tinBan`).
+   ===================================================================== */
+var chatHen = [], daHoiTu = {}, daTuyenBo = false;
+
+/* =====================================================================
+   CHUYÊN GIA VÀ KẺ NÓI DỐI (16/11/2026) — "tầng 16 vẫn khó nhưng phải GIẢI ĐƯỢC"
+   Câu cực khó mà không ai biết thì chỉ là tung đồng xu. Nên: mỗi người máy RÀNH MỘT
+   MẢNG, câu đúng mảng thì nó gần như chắc chắn biết và lên tiếng trong chat. Nhưng mỗi
+   ván có 2 KẺ NÓI DỐI bí mật — nói ngược điều nó biết 75% số lần, còn lá phiếu kín thì
+   bỏ theo sự thật (để được +3 khi cả phòng tin nó mà sai).
+   Giải được nhờ THÀNH TÍCH CÔNG KHAI: ai nói gì trong chat, đáp án lộ ra là chấm ✓/✗
+   ngay dưới cabin. Tới tầng 16 (vòng ~7) đã đủ dữ kiện để thấy ai hay nói sai.
+   Câu hỏi đổi từ "anh có biết lượng tử không" thành "anh có tin đúng người không".
+   ===================================================================== */
+var CHUYEN_MON = { 'QUẠ': 'TOÁN CAO CẤP', 'CÚ': 'AI', 'CÁO': 'KINH TẾ', 'RẮN': 'LƯỢNG TỬ',
+                   'GẤU': 'XÃ HỘI', 'HẠC': 'AI', 'MỐI': 'TOÁN CAO CẤP' };
+var SO_KE_DOI = 2;
+function tenMang(nh){
+  return { 'AI': 'AI', 'LƯỢNG TỬ': 'lượng tử', 'KINH TẾ': 'kinh tế', 'XÃ HỘI': 'xã hội',
+           'TOÁN CAO CẤP': 'toán' }[nh] || String(nh).toLowerCase();
+}
+function chiaVai(may){
+  var ke = hsXao(may).slice(0, SO_KE_DOI);
+  may.forEach(function(p){
+    p.chuyenMon = CHUYEN_MON[p.ten] || ''; p.noiDoi = ke.indexOf(p) >= 0;
+    p.dungCong = 0; p.saiCong = 0; p._tuyen = undefined; p._daTuyen = false;
+  });
+}
+function uyTin(p){ return ((p.dungCong || 0) + 1) / ((p.dungCong || 0) + (p.saiCong || 0) + 2); }
+/* điều nó NÓI RA — khác lá phiếu kín. Tính một lần mỗi vòng rồi giữ nguyên. */
+function tuyenBo(p){
+  if (p._tuyen === undefined){
+    if (p.noiDoi) p._tuyen = (Math.random() < .8) ? !p._tinRieng : p._tinRieng;
+    else p._tuyen = p._tinRieng;
+  }
+  return p._tuyen;
+}
+function chuyenGiaCua(may, q){
+  if (q.pha !== 2) return [];
+  return may.filter(function(p){ return p.song !== false && p.chuyenMon === q.nh; })
+            .sort(function(a, b){ return uyTin(b) - uyTin(a); });
+}
+/* đám đông nghe chuyên gia có thành tích tốt nhất của mảng đó */
+function theoChuyenGia(may, q){
+  var cg = chuyenGiaCua(may, q);
+  if (!cg.length) return [];
+  var nguon = cg[0], noi = tuyenBo(nguon), doi = [];
+  may.forEach(function(p){
+    if (cg.indexOf(p) >= 0 || p.noiDoi || p.chonDuKien === noi) return;
+    if (Math.random() < (.3 + .45 * p.theoDam) * uyTin(nguon) * 1.6){
+      p.chonDuKien = noi; p.ngheCG = nguon; doi.push(p);
+    }
+  });
+  return doi;
+}
+/* lộ đáp án rồi thì chấm điểm công khai cho ai đã lên tiếng */
+function ghiThanhTich(){
+  ds.forEach(function(p){
+    if (p._daTuyen && p._tuyen !== undefined){
+      if (p._tuyen === cau._dap) p.dungCong = (p.dungCong || 0) + 1;
+      else p.saiCong = (p.saiCong || 0) + 1;
+    }
+    p._daTuyen = false; p._tuyen = undefined;
+  });
+}
+
+function tenTu(i){ return TU[i] ? TU[i].ten : '?'; }
+
+function noiChat(ai, chu, lop){
+  var d = el('dongChat');
+  var dong = document.createElement('div');
+  dong.className = 'tin' + (lop ? ' ' + lop : '');
+  dong.innerHTML = '<b>' + ai.ten + '</b> ' + chu;
+  d.appendChild(dong);
+  d.scrollTop = d.scrollHeight;
+  if (ai.lan !== undefined) ai.noiLuc = performance.now();
+}
+function hen1(fn, ms){ chatHen.push(setTimeout(fn, ms)); }
+function dungChat(){ chatHen.forEach(clearTimeout); chatHen = []; }
+
+/* người máy nhớ gì về câu này */
+function nhoCuaMay(p, q){
+  /* Chỉ được nói về tờ NÓ THẬT SỰ ĐÃ ĐỌC. Bản đầu cho một con đọc đúng chỗ mà nhớ sai
+     đi trích nguyên dòng của tờ bẫy — tờ nó chưa từng ghé. Nghe là biết bịa. */
+  if (!q.hs) return null;
+  var doc = p.daXemTram || [];
+  var daDocNguon = q.nguon.filter(function(i){ return doc[i]; });
+  var thieu = q.nguon.filter(function(i){ return !doc[i]; });
+  var docBay = q.bay.some(function(i){ return doc[i]; });
+  if (!thieu.length){
+    if (p._tinRieng === q._dap) return q.noiDung;
+    return 'Tôi có đọc ' + q.nguon.map(tenTu).join(' với ') + ' mà nhớ lơ mơ, thấy ' +
+           (p._tinRieng ? 'đúng là vậy' : 'không phải vậy') + '.';
+  }
+  if (docBay && q.noiBay) return q.noiBay;
+  if (daDocNguon.length)
+    return 'Tôi mới đọc ' + daDocNguon.map(tenTu).join(', ') + ', chưa ghé ' + thieu.map(tenTu).join(', ') + ' nên chưa chắc.';
+  return null;
+}
+/* biết một đằng mà bỏ phiếu một nẻo thì phải nói ra, không thì chat nghe như nói dối */
+function duoiTheoDam(p){
+  return (p._tinRieng !== p.chonDuKien)
+    ? ' …nhưng tôi theo số đông: ' + (p.chonDuKien ? 'ĐÚNG' : 'SAI') + '.' : '';
+}
+function choChuaDoc(p, q){
+  var doc = p.daXemTram || [];
+  for (var i = 0; i < q.nguon.length; i++) if (!doc[q.nguon[i]]) return tenTu(q.nguon[i]);
+  return tenTu(q.nguon[0]);
+}
+function loiCuaMay(p){
+  /* CHẤM ✓✗ CHỈ KHI KHẲNG ĐỊNH. Bản đầu chấm cả câu đoán bừa và lá phiếu nép đám đông —
+     mà đám đông sai gần nửa số vòng — nên sau 6 vòng người thật thà cũng ✓1 ✗5 y như kẻ
+     nói dối, ✓✗ thành vô dụng. Giờ: "đoán", "theo số đông", "nghe X" đều KHÔNG chấm. */
+  var q = cau;
+  if (p.noiDoi){
+    var nl = tuyenBo(p), cl = nl ? 'ĐÚNG' : 'SAI';
+    p._daTuyen = true;
+    if (q.pha === 2 && p.chuyenMon === q.nh) return 'Tôi rành ' + tenMang(q.nh) + '. Câu này <b>' + cl + '</b>, chắc chắn.';
+    if (q.hs) return ((nl !== q._dap) ? (q.noiBay ? q.noiBay + ' ' : '') : q.noiDung + ' ') + 'Tôi chọn ' + cl + '.';
+    return hsLay(['Chắc chắn ', 'Dễ mà, ', 'Tôi biết câu này: ']) + cl + '.';
+  }
+  var chonChu = p.chonDuKien ? 'ĐÚNG' : 'SAI', tinChu = p._tinRieng ? 'ĐÚNG' : 'SAI';
+  var theoDam = (p._tinRieng !== p.chonDuKien) ? ' …nhưng thôi, tôi theo số đông: ' + chonChu + '.' : '';
+  function khang(){ p._tuyen = p._tinRieng; p._daTuyen = true; }
+  if (q.pha === 2 && p.chuyenMon === q.nh){ khang(); return 'Tôi rành ' + tenMang(q.nh) + '. Câu này <b>' + tinChu + '</b>, chắc chắn.'; }
+  if (p.ngheCG) return 'Tôi không rành ' + tenMang(q.nh) + '. Nghe ' + p.ngheCG.ten + ' thì ' + chonChu + '.';
+  if (q.hs){
+    var nho = nhoCuaMay(p, q);
+    var du = q.nguon.every(function(i){ return (p.daXemTram || [])[i]; });
+    if (nho){ if (du) khang(); return nho + (theoDam || ' Tôi chọn ' + chonChu + '.'); }
+    var cho = choChuaDoc(p, q);
+    return hsLay(['Tôi không đọc ' + cho + '.', 'Chỗ ' + cho + ' tôi chưa ghé.',
+                  'Tôi không nhớ tờ đó.']) + ' Đoán ' + chonChu + '.';
+  }
+  if (p.biet > .64){ khang(); return (p.biet > .78 ? 'Chắc chắn' : 'Tôi nghĩ là') + ' ' + tinChu + '.' + theoDam; }
+  return 'Đoán bừa thôi, ' + chonChu + '.';
+}
+
+function batDauChat(){
+  dungChat();
+  daHoiTu = {}; daTuyenBo = false;
+  el('dongChat').innerHTML = '<div class="tin he">1 phút 45 để bàn. Lá phiếu vẫn kín — nói gì cũng được.</div>';
+  var tt = cau._tt;
+  var may = ds.filter(function(p){ return p.song && !p.nguoi; });
+  may.forEach(function(p){
+    p.chonDuKien = mayChon(p, cau, tt); p.daNoiCau = false; p.nghe = null; p.ngheCG = null;
+    p._tuyen = undefined; p._daTuyen = false;
+  });
+  var doiY = hopSuc(may, cau);
+  var cgVong = chuyenGiaCua(may, cau);
+  theoChuyenGia(may, cau);
+  /* tầng 16: chuyên gia nói TRƯỚC, người nghe theo nói sau cho có đầu có đuôi */
+  var thuTu = hsXao(may).sort(function(a, b){ return (cgVong.indexOf(a) >= 0 ? 0 : 1) - (cgVong.indexOf(b) >= 0 ? 0 : 1); });
+  thuTu.forEach(function(p, i){
+    var luc = 2500 + i * 3200 + Math.random() * 6000 * (1.2 - p.lieu);
+    hen1(function(){
+      if (daKhoa || !p.song) return;
+      /* đã trả lời câu hỏi của bạn rồi thì chỉ chốt lại lựa chọn, khỏi nói lặp */
+      noiChat(p, p.daNoiCau
+        ? ((!p.noiDoi && p._tinRieng !== p.chonDuKien && !p.theoBan) ? 'Biết vậy, nhưng tôi vẫn theo số đông: ' : 'Tôi vẫn chọn ') +
+          ((p.noiDoi ? tuyenBo(p) : p.chonDuKien) ? 'ĐÚNG' : 'SAI') + '.'
+        : loiCuaMay(p));
+      p.daNoiCau = true;
+    }, luc);
+    if (Math.random() < .35){
+      hen1(function(){
+        if (daKhoa || !p.song) return;
+        noiChat(p, hsLay(p.theoDam > .75 ? ['Đa số chọn gì thì tôi chọn nấy.', 'Đừng ai đi một mình.']
+                                          : ['Ai đọc kỹ thì lên tiếng đi.', 'Đừng tin tờ không có dấu.',
+                                             'Câu này có bẫy.']));
+      }, luc + 15000 + Math.random() * 25000);
+    }
+  });
+  doiY.forEach(function(p, i){
+    hen1(function(){
+      if (daKhoa || !p.song) return;
+      noiChat(p, p.nghe ? 'Nghe ' + p.nghe.ten + ' nói vậy thì tôi đổi sang ' + (p.chonDuKien ? 'ĐÚNG' : 'SAI') + '.'
+                        : 'Thôi, tôi tin cái mình đọc: ' + (p.chonDuKien ? 'ĐÚNG' : 'SAI') + '.');
+    }, 32000 + i * 6000 + Math.random() * 12000);
+  });
+  veNutChat();
+}
+
+function veNutChat(){
+  var q = cau, h = '';
+  if (!daTuyenBo){
+    h += '<button class="chip ban" data-k="tbD">Tôi chọn ĐÚNG</button>';
+    h += '<button class="chip ban" data-k="tbS">Tôi chọn SAI</button>';
+  }
+  if (q.hs){
+    var cho = q.nguon.concat(q.bay).filter(function(v, i, a){ return a.indexOf(v) === i; });
+    cho.forEach(function(i){ if (!daHoiTu[i]) h += '<button class="chip" data-k="hoi' + i + '">Ai đọc ' + tenTu(i) + '?</button>'; });
+  } else {
+    if (q.pha === 2 && !daHoiTu.cg) h += '<button class="chip" data-k="cg">Ai rành ' + tenMang(q.nh) + '?</button>';
+    if (!daHoiTu.y) h += '<button class="chip" data-k="y">Mọi người nghĩ sao?</button>';
+  }
+  el('nutChat').innerHTML = h;
+  el('nutChat').querySelectorAll('.chip').forEach(function(b){ b.onclick = function(){ bamChip(b.dataset.k); }; });
+}
+
+function bamChip(k){
+  if (daKhoa) return;
+  var may = ds.filter(function(p){ return p.song && !p.nguoi; });
+  if (k === 'tbD' || k === 'tbS'){
+    var v = (k === 'tbD');
+    daTuyenBo = true;
+    ban._tuyen = v; ban._daTuyen = true;      /* lời bạn cũng bị chấm ✓/✗ công khai */
+    noiChat(ban, 'Tôi chọn <b>' + (v ? 'ĐÚNG' : 'SAI') + '</b>.', 'cua-ban');
+    var theo = [], cai = [];
+    may.forEach(function(p){
+      if (p.chonDuKien === v) return;
+      var nho = nhoCuaMay(p, cau);
+      var chac = nho && p._tinRieng === cau._dap;               /* nó đọc và nhớ đúng */
+      if (!chac && !p.noiDoi && Math.random() < p.theoDam * .42 * uyTin(ban) * 2 * (p.tinBan === undefined ? 1 : p.tinBan)){
+        p.chonDuKien = v; p.theoBan = true; theo.push(p);
+      } else if (chac) cai.push(p);
+    });
+    if (theo.length) hen1(function(){ noiChat(theo[0], theo.length > 1 ? 'Tôi với ' + (theo.length - 1) + ' người nữa theo bạn.' : 'Ừ, tôi theo bạn.'); }, 1400);
+    if (cai.length) hen1(function(){ if (!daKhoa) noiChat(cai[0], 'Không. ' + nhoCuaMay(cai[0], cau)); }, 2600);
+  } else if (k === 'cg'){
+    daHoiTu.cg = true;
+    noiChat(ban, 'Ai rành <b>' + tenMang(cau.nh) + '</b>?', 'cua-ban');
+    var cg = chuyenGiaCua(may, cau);
+    if (!cg.length) hen1(function(){ if (!daKhoa) noiChat(may[0] || ban, 'Không ai ở đây rành ' + tenMang(cau.nh) + ' cả.'); }, 1200);
+    cg.forEach(function(p, j){
+      hen1(function(){ if (!daKhoa){ noiChat(p, loiCuaMay(p)); p.daNoiCau = true; } }, 1000 + j * 1600);
+    });
+  } else if (k === 'y'){
+    daHoiTu.y = true;
+    noiChat(ban, 'Mọi người nghĩ sao?', 'cua-ban');
+    hsXao(may).filter(function(p){ return !p.daNoiCau; }).slice(0, 3).forEach(function(p, i){
+      hen1(function(){ if (!daKhoa){ noiChat(p, loiCuaMay(p)); p.daNoiCau = true; } }, 1100 + i * 1300);
+    });
+  } else if (k.indexOf('hoi') === 0){
+    var i = +k.slice(3);
+    daHoiTu[i] = true;
+    noiChat(ban, 'Ai đọc <b>' + tenTu(i) + '</b>?', 'cua-ban');
+    var doc = may.filter(function(p){ return p.daXemTram && p.daXemTram[i]; });
+    if (!doc.length) hen1(function(){ if (!daKhoa) noiChat(may[0] || ban, 'Không ai ghé ' + tenTu(i) + ' cả.'); }, 1200);
+    doc.slice(0, 3).forEach(function(p, j){
+      hen1(function(){
+        if (daKhoa) return;
+        var noi = p.noiDoi ? tuyenBo(p) : p._tinRieng;
+        var duN = cau.nguon.every(function(t){ return (p.daXemTram || [])[t]; });
+        if (p.noiDoi || duN){ p._tuyen = noi; p._daTuyen = true; }
+        var nho = (p.noiDoi && noi !== p._tinRieng && cau.noiBay) ? cau.noiBay : nhoCuaMay(p, cau);
+        noiChat(p, (nho ? nho : 'Tôi có ghé ' + tenTu(i) + ' mà không để ý dòng đó.') +
+                   (p.noiDoi ? ' Tôi chọn ' + (noi ? 'ĐÚNG' : 'SAI') + '.' : duoiTheoDam(p)));
+        p.daNoiCau = true;
+      }, 1000 + j * 1500);
+    });
+  }
+  veNutChat();
+}
+
+/* HỢP SỨC: con nào đọc đủ chỗ chứa sự thật và nhớ đúng thì nói ra trong chat; mỗi con
+   như vậy kéo được vài con khác đổi theo. Không có cái này thì câu hồ sơ thành bẫy cho cả
+   phòng (máy đọc lẻ tẻ, phần lớn không đọc đúng chỗ) → đa số sai liên tục → người CHỌN
+   BỪA thoát 12% số ván. Đo lại sau khi có: xem TRO-CHOI-BIEN-GIOI.md.
+   Dùng chung cho ván thật lẫn mô phỏng; trả về danh sách con đã đổi ý để chat kể lại. */
+function hopSuc(may, q){
+  if (!q.hs) return [];
+  var biet = may.filter(function(p){
+    var doc = p.daXemTram || [];
+    return q.nguon.every(function(i){ return doc[i]; }) && p._tinRieng === q._dap;
+  });
+  if (!biet.length) return [];
+  var doi = [];
+  may.forEach(function(p){
+    if (p.chonDuKien === q._dap) return;
+    var laNguoiBiet = biet.indexOf(p) >= 0;          /* biết mà đã nép theo đám đông */
+    /* đã đo 3 mức: 0 → đa số sai 59%, người chơi thật chết 47%; .05 → 42% / 37%;
+       .08 → 34% / 37% nhưng người giỏi mất 9 vòng. .05 giữ đa số sai quanh mức thiết kế gốc. */
+    var pDoi = Math.min(.25, .05 * biet.length) * (1 - p.lieu * .3) * (laNguoiBiet ? 1.2 : 1);
+    if (Math.random() < pDoi){ p.chonDuKien = q._dap; p.nghe = laNguoiBiet ? null : biet[0]; doi.push(p); }
+  });
+  return doi;
+}
+
+/* sau khi lộ kết quả: ai theo bạn mà sai thì bớt tin bạn */
+function capNhatTinBan(){
+  ds.forEach(function(p){
+    if (p.theoBan && p.chon !== cau._dap) p.tinBan = (p.tinBan === undefined ? 1 : p.tinBan) * .35;
+    p.theoBan = false;
+  });
+}
+
+/* =====================================================================
+   LÕI LUẬT CHƠI — dùng chung cho cả ván thật lẫn ván mô phỏng
+   ===================================================================== */
+
+/* máy chọn gì. tt = tình hình ván, dùng để biết mình có đang tụt hậu không */
+function mayChon(m, q, tt){
+  /* Hai thứ khác nhau quyết định một người trả lời đúng hay sai:
+     — ĐỘ DỄ: câu hiển nhiên thì gần như ai cũng đúng, kể cả người dốt nhất phòng.
+     — ĐỘ BẪY: câu có đáp án trực giác NGƯỢC với sự thật thì phần lớn người sập,
+       chỉ ai thật sự nắm chắc mới gỡ ra. Đây là nguồn duy nhất của +3 tầng:
+       không có bẫy thì cả phòng cùng đúng và ai cũng chỉ nhích 1 tầng mỗi vòng.
+     Độ bẫy suy ra thẳng từ n: tỉ lệ người thường chọn NHẦM phía. */
+  var biet = Math.max(0.2, Math.min(0.97, m.biet * (m.heCap || 1)));
+  var deDang = 1 - (1 - biet) * (0.12 + 1.05 * q.k);
+  var bay = q._dap ? (1 - q.n) : q.n;
+  var khangBay = Math.pow(biet, 3);
+  if (q.tl){                                     /* câu hồ sơ: đọc kỹ thì gỡ được bẫy */
+    bay = bay * (1.35 - 0.85 * m.doc);
+    khangBay = Math.pow(biet, 2) * (0.35 + 0.65 * m.doc);
+  }
+  bay = Math.max(0, Math.min(1, bay));
+  var nang = deDang * (1 - bay) + khangBay * bay;
+  nang = Math.max(0.03, Math.min(0.98, nang));
+  var tin = (Math.random() < nang) ? q._dap : !q._dap;              /* niềm tin của nó */
+  /* CÂU HỒ SƠ SINH MỚI: nó biết hay không tuỳ vào ĐÚNG CHỖ nó đã ghé trong phòng.
+     Đọc đủ chỗ chứa sự thật → nhớ đúng theo trí nhớ; chỉ đọc chỗ bẫy → tin nhầm;
+     không đọc gì → đoán như người thường. */
+  if (q.hs && m.daXemTram){
+    var du = q.nguon.every(function(i){ return m.daXemTram[i]; });
+    var dinhBay = q.bay.some(function(i){ return m.daXemTram[i]; });
+    if (du){ nang = .5 + .45 * biet; tin = (Math.random() < nang) ? q._dap : !q._dap; }
+    else if (dinhBay){ nang = .75; tin = (Math.random() < .8) ? !q._dap : q._dap; }
+  }
+  /* kẻ nói dối là NGƯỜI CỦA TOÀ NHÀ: nó biết đáp án, và cố tình nói ngược */
+  if (m.noiDoi){ tin = q._dap; nang = .97; }
+  var laChuyenGia = (q.pha === 2 && m.chuyenMon && m.chuyenMon === q.nh);
+  if (laChuyenGia){ nang = .95; tin = (Math.random() < .95) ? q._dap : !q._dap; }
+  m._tinRieng = tin;
+  /* chuyên gia đúng mảng và (từ tầng 16) kẻ nói dối bỏ phiếu theo điều mình biết, không nép.
+     Ở pha 1 kẻ nói dối vẫn nép như mọi người — để nó đi riêng từ đầu thì phòng vỡ ra, hòa
+     phiếu tăng vọt và ván dài thêm ~12 vòng (đã đo). */
+  if (laChuyenGia || (m.noiDoi && q.pha === 2)) return tin;
+
+  /* phía đám đông: mặc định là thói quen (q.n); có chat thì nhìn thấy phòng THẬT */
+  var damDong = (tt && tt.damDongThat !== undefined) ? tt.damDongThat : (q.n >= 0.5);
+  var roRang = Math.abs(q.n - 0.5) * 2;           /* đám đông rõ ràng tới đâu */
+  if (tin !== damDong){
+    /* Niềm tin của mình NGƯỢC đám đông. Đây là chỗ duy nhất người ta chết trong trò này,
+       nên mặc định phải là NÉP VÀO ĐÁM ĐÔNG — chỉ ai vừa chắc vừa gan mới dám đi riêng.
+       Để ai cũng dám đi riêng thì phòng vỡ 5-4 mỗi vòng và chết sạch sau 6 vòng, lúc đó
+       ván biến thành một chọi một và đứng im vì hòa phiếu (−2 cho cả hai) — đã đo và hỏng. */
+    var tut = Math.max(0, (tt.tangCaoNhat - m.tang)) / TANG_DICH;   /* tụt hậu thì liều hơn */
+    var gan = m.lieu * Math.pow(nang, 1.6) * (1 - m.theoDam * 0.45) + tut * 0.35;
+    gan *= (1.25 - 0.5 * roRang);                 /* đám đông càng rõ thì càng ngại đi riêng */
+    if (Math.random() > gan) tin = damDong;
+  }
+  return tin;
+}
+
+/* tính kết quả một vòng. ds = danh sách người còn sống đã có .chon */
+function tinhVong(ds, dapAn){
+  var song = ds.filter(function(p){ return p.song; });
+  var soD = 0, soS = 0;
+  song.forEach(function(p){ if (p.chon === true) soD++; else if (p.chon === false) soS++; });
+  var daSo = soD > soS ? true : (soS > soD ? false : null);   /* null = hòa phiếu */
+
+  song.forEach(function(p){
+    p.doi = 0; p.vuaLoai = false;
+    if (p.chon === null){ p.doi = -2; return; }                /* hết giờ không chọn */
+    /* HÒA PHIẾU: không ai lên xuống (user bỏ luật "cả phòng −2" ngày 16/11/2026).
+       Còn hai người mà bất đồng là hòa → cả hai trượt xuống mãi; đo thì hòa chiếm 25–30% số vòng. */
+    if (daSo === null){ p.doi = 0; return; }
+    var dung = (p.chon === dapAn), theoDaSo = (p.chon === daSo);
+    if (dung && theoDaSo)        p.doi = 1;
+    else if (dung && !theoDaSo)  p.doi = 3;
+    else if (!dung && theoDaSo)  p.doi = -2;
+    else { p.vuaLoai = true; p.doi = 0; }
+  });
+
+  song.forEach(function(p){
+    if (p.vuaLoai){ p.song = false; return; }
+    p.tang = Math.max(0, Math.min(TANG_DICH, p.tang + p.doi));
+  });
+
+  return { soD: soD, soS: soS, daSo: daSo, daSoSai: (daSo !== null && daSo !== dapAn) };
+}
+
+function tinhTT(ds, banLaAi, daSoSaiVongTruoc){
+  var song = ds.filter(function(p){ return p.song; });
+  var cao = 0;
+  song.forEach(function(p){ if (p.tang > cao) cao = p.tang; });
+  return {
+    conSong: song.length,
+    tangCaoNhat: cao,
+    tangBan: banLaAi ? banLaAi.tang : 0,
+    banDanDau: banLaAi ? banLaAi.tang >= cao : false,
+    daSoSaiVongTruoc: !!daSoSaiVongTruoc
+  };
+}
+
+function chotDap(q, tt){ return typeof q.d === 'function' ? q.d(tt) : q.d; }
+
+/* =====================================================================
+   VÁN THẬT
+   ===================================================================== */
+var ds = [], ban = null, vong = 0, pha = 1, daRa = {}, cau = null;
+var chonCuaBan = null, daKhoa = false, hen = null, conLai = 0, daSoSaiTruoc = false;
+var soVongDaSoSai = 0, soBiLoai = 0;
+
+var el = function(id){ return document.getElementById(id); };
+
+function batDauVan(){
+  ds = [];
+  ban = { ten: 'BẠN', nguoi: true, tang: TANG_BAT_DAU, song: true, chon: null, doi: 0 };
+  ds.push(ban);
+  ban.soHS = soHSCuaBan;
+  MAU_MAY.forEach(function(m){
+    /* ĐỘ DOC THẬT = nó đọc được gì trong phòng hồ sơ, không phải tính cách suông.
+       Tính cách doc chỉ quyết định nó CÓ CHỊU đi đọc hay không; cái nó thật sự cầm được
+       mới đếm. Giự lại 45% tính cách để ai bỏ qua phòng thì cả phòng không thành mù hết.
+       Bản MÔ PHỎNG không có phòng nên vẫn dùng m.doc gốc — đừng lần hai con số này. */
+    var k = ketQuaPhong[m.ten];
+    var docThat = k ? Math.max(.05, Math.min(1, .45 * m.doc + .6 * (k.soQT / SO_QUAN_TRONG))) : m.doc;
+    ds.push({ ten: m.ten, biet: m.biet, theoDam: m.theoDam, lieu: m.lieu, doc: docThat,
+              docGoc: m.doc, soHS: k ? k.soDoc : 0, daXemTram: k ? k.daXem.slice() : [], tinBan: 1,
+              heCap: capMay.he, tang: TANG_BAT_DAU, song: true, chon: null, doi: 0 });
+  });
+  chiaVai(ds.filter(function(p){ return !p.nguoi; }));
+  ban.dungCong = 0; ban.saiCong = 0;
+  vong = 0; pha = 1; daRa = {}; daSoSaiTruoc = false; soVongDaSoSai = 0; soBiLoai = 0;
+  document.body.classList.remove('unknown');
+  thapCo();
+  thapDung();
+  el('nutTiep').classList.add('an');
+  vaoVong();
+}
+
+function layCau(){ return rutCau(CAU_HOI, daRa, pha); }
+
+function vaoVong(){
+  vong++;
+  cau = layCau();
+  daRa[cau.id] = true;
+  var tt = tinhTT(ds, ban, daSoSaiTruoc);
+  cau._dap = chotDap(cau, tt);              /* khóa đáp án NGAY khi hiện câu hỏi */
+  cau._tt = tt;
+  chonCuaBan = null; daKhoa = false;
+  ds.forEach(function(p){ p.chon = null; p.doi = 0; p.vuaLoai = false; p.the = null; });
+
+  el('soVong').textContent = vong;
+  el('tangBan').textContent = ban.tang;
+  el('conSong').textContent = tt.conSong;
+  el('nhomCau').textContent = cau.nh + (cau.tl ? ' · CẦN HỒ SƠ' : '');
+  el('cauHoi').textContent = cau.t;
+  el('nutDung2').classList.remove('sang');
+  el('nutSai').classList.remove('sang');
+  el('nutKhoa').classList.add('an');
+  el('ghiChu').textContent = 'Chọn một bên. Khóa sớm thì cả phòng khóa theo.';
+  el('giaiThich').classList.add('an');
+  el('ketBan').classList.add('an');
+  el('khoiChon').classList.remove('an');
+  el('nutTiep').classList.add('an');
+  capNhatTangBan();
+  /* câu dài (câu cực khó tới 4 dòng) làm thẻ cao lên: đo lại toà nhà cho nó CO LẠI,
+     không thì nó giữ cỡ cũ và bị cắt mất phần đáy cùng mấy cabin ở dưới */
+  thapCo(); ngamThap(true);
+  batDauChat();
+
+  conLai = GIAY_HOI;
+  el('thanhGio').style.width = '100%';
+  if (hen) clearInterval(hen);
+  hen = setInterval(function(){
+    conLai -= 0.1;
+    el('thanhGio').style.width = Math.max(0, conLai / GIAY_HOI * 100) + '%';
+    if (conLai <= 5.6 && conLai > 5.5) AM.tich();
+    if (Math.abs(conLai - Math.round(conLai)) < 0.05 && conLai <= 5 && conLai > 0) AM.tich();
+    if (conLai <= 0){ clearInterval(hen); hen = null; khoa(); }
+  }, 100);
+}
+
+function chon(v){
+  if (daKhoa) return;
+  chonCuaBan = v;
+  el('nutDung2').classList.toggle('sang', v === true);
+  el('nutSai').classList.toggle('sang', v === false);
+  el('nutKhoa').classList.remove('an');
+  ban.the = v ? 'D' : 'S';      /* lá phiếu của chính bạn thì ngửa, của người khác thì úp */
+  AM.chon();
+}
+
+function khoa(){
+  if (daKhoa) return;
+  daKhoa = true;
+  if (hen){ clearInterval(hen); hen = null; }
+  AM.khoa();
+  ban.chon = chonCuaBan;
+  var tt = cau._tt;
+  dungChat();
+  /* dùng đúng lựa chọn máy đã nói trong chat (đã tính cả việc nghe theo bạn) */
+  ds.forEach(function(p){
+    if (!p.nguoi && p.song) p.chon = (p.chonDuKien !== undefined) ? p.chonDuKien : mayChon(p, cau, tt);
+    p.chonDuKien = undefined;
+  });
+  ds.forEach(function(p){ if (p.song && !p.nguoi && p.chon !== null) p.the = '?'; });
+  setTimeout(loKetQua, 420);
+}
+
+function loKetQua(){
+  /* lấy phiếu TRƯỚC khi tính vòng, vì tính xong là có người bị loại */
+  ds.forEach(function(p){
+    if (p.song) p.the = (p.chon === true) ? 'D' : (p.chon === false) ? 'S' : null;
+  });
+  capNhatTinBan();
+  ghiThanhTich();
+  var kq = tinhVong(ds, cau._dap);
+  daSoSaiTruoc = kq.daSoSai;
+  if (kq.daSoSai) soVongDaSoSai++;
+  soBiLoai += ds.filter(function(p){ return p.vuaLoai; }).length;
+
+  /* đổi pha phải xết TRƯỚC khi vẽ lại nền, không thì trời đêm còn màu cũ */
+  if (pha === 1 && ds.some(function(p){ return p.song && p.tang >= TANG_UNKNOWN; })){
+    pha = 2;
+    document.body.classList.add('unknown');
+    veNenThap();
+    AM.pha2();
+  }
+
+  el('khoiChon').classList.add('an');
+  el('nutKhoa').classList.add('an');
+  el('nutTiep').classList.remove('an');
+  el('nhomCau').textContent = 'KẾT QUẢ VÒNG ' + vong;
+  el('ghiChu').textContent = 'Chạm vào toà nhà để sang vòng sau ngay.';
+  AM.lo();
+  capNhatTangBan();
+
+  batDauLo(kq, cau._dap, function(){ sangVongTiep(); });
+}
+
+/* NHỊP 1 (lúc thang bắt đầu chạy): chuyện gì vừa xảy ra với RIÊNG BẠN */
+function hienKetBan(){
+  var kq = loTrinh ? loTrinh.kq : null;
+  var t = '', lop = 'ket-ban ';
+  if (ban.chon === null)      { t = 'Bạn không kịp chọn — tụt 2 tầng.'; lop += 'xuong'; AM.xuong(); }
+  else if (!ban.song)         { t = 'BẠN BỊ LOẠI — sai, và sai một mình.'; lop += 'chet'; }
+  else if (ban.doi === 3)     { t = 'Đúng, và cả phòng nhầm. +3 tầng.'; lop += 'len'; AM.vot(); }
+  else if (ban.doi === 1)     { t = 'Đúng, nhưng ai cũng đúng. +1 tầng.'; lop += 'len'; AM.len(); }
+  else if (kq && kq.daSo === null) { t = 'Hòa phiếu — không ai lên xuống.'; lop += 'xuong'; }
+  else                        { t = 'Sai, nhưng đông người sai cùng. −2 tầng.'; lop += 'xuong'; AM.xuong(); }
+  var chet = ds.filter(function(p){ return p.vuaLoai; });
+  el('ketBan').className = lop;
+  el('ketBan').innerHTML = t + (chet.length
+    ? '<span class="ai">Cáp đứt: ' + chet.map(function(p){ return p.ten; }).join(', ') + '</span>'
+    : '');
+  el('ketBan').classList.remove('an');
+  thapCo();
+}
+
+/* NHỊP 2 (sau khi thang dừng): tại sao đáp án lại là thế */
+function hienGiaiThich(){
+  /* ĐÃ TẮT (user chốt 16/11/2026: "phần giải thích cũng bỏ đi", nhiều chữ quá).
+     Dữ liệu giải thích (cau.g) vẫn giữ trong từng câu — muốn bật lại thì đổi TAT_GIAI. */
+  var TAT_GIAI = true;
+  if (TAT_GIAI) return;
+  var g = typeof cau.g === 'function' ? cau.g(cau._tt) : cau.g;
+  el('giaiThich').innerHTML = g;
+  el('giaiThich').classList.remove('an');
+}
+
+function capNhatDemTiep(con){
+  var g = Math.ceil(con);
+  el('nutTiep').textContent = 'VÒNG SAU · ' + g + 's   (chạm để đi ngay)';
+}
+
+function sangVongTiep(){
+  var thang = ds.filter(function(p){ return p.song && p.tang >= TANG_DICH; });
+  var song = ds.filter(function(p){ return p.song; });
+  if (thang.length || !ban.song || !song.length){ ketThuc(thang); return; }
+  vaoVong();
+}
+
+function ketThuc(thang){
+  if (hen){ clearInterval(hen); hen = null; }
+  dungChat();
+  loTrinh = null;
+  el('manVong').classList.add('an');
+  el('manKet').classList.remove('an');
+  var banThang = thang && thang.indexOf(ban) >= 0;
+  if (banThang){
+    el('ketTieuDe').textContent = 'CỬA MỞ';
+    el('ketPhu').textContent = 'Bạn ra khỏi thang máy ở tầng 20.';
+    AM.thang();
+  } else if (thang && thang.length){
+    el('ketTieuDe').textContent = thang[0].ten + ' ĐÃ RA';
+    el('ketPhu').textContent = 'Cửa đóng lại trước mặt bạn ở tầng ' + ban.tang + '.';
+    AM.thua();
+  } else if (!ban.song){
+    el('ketTieuDe').textContent = 'BẠN BỊ LOẠI';
+    el('ketPhu').textContent = 'Sai một mình ở tầng ' + ban.tang + '.';
+    AM.thua();
+  } else {
+    el('ketTieuDe').textContent = 'CHỈ CÒN BẠN';
+    el('ketPhu').textContent = 'Không còn ai để làm nên đa số.';
+    AM.thua();
+  }
+  veBangVao('bangCuoi', false);
+  el('thongKe').innerHTML =
+    '<div class="hang tk"><span class="ten">Số vòng đã đi</span><span class="so">' + vong + '</span></div>' +
+    '<div class="hang tk"><span class="ten">Bị loại</span><span class="so">' + soBiLoai + ' người</span></div>' +
+    '<div class="hang tk"><span class="ten">Vòng cả phòng sai</span><span class="so">' +
+      soVongDaSoSai + '/' + vong + '</span></div>';
+}
+
+/* ---------------------------------------------------------------- VẼ */
+function veBangVao(id, hienDoi){
+  var h = ds.slice().sort(function(a, b){
+    if (a.song !== b.song) return a.song ? -1 : 1;
+    return b.tang - a.tang;
+  });
+  el(id).innerHTML = h.map(function(p){
+    var d = '';
+    if (hienDoi && p.song && p.doi) d = (p.doi > 0 ? '<span class="len">+' + p.doi + '</span>'
+                                                  : '<span class="xuong">' + p.doi + '</span>');
+    if (hienDoi && p.vuaLoai) d = '<span class="chet">✕</span>';
+    return '<div class="hang' + (p.nguoi ? ' ban' : '') + (p.song ? '' : ' die') + '">' +
+      '<span class="ten">' + p.ten + '</span>' +
+      '<span class="hs-dem">' + (p.soHS ? '📄' + p.soHS : '') + '</span>' +
+      '<div class="thanh"><i style="width:' + (p.tang / TANG_DICH * 100) + '%"></i></div>' +
+      '<span class="so">' + p.tang + '</span><span class="doi">' + d + '</span></div>';
+  }).join('');
+}
+
+/* ============================================================== MẶT TIỀN TOÀ NHÀ
+   Vẽ Ở ĐỘ PHÂN GIẢI THẬT. Đã thử bản "pixel" (vẽ vào bộ đệm 114×175 rồi phóng to) —
+   HỎNG: cảnh nhiều chi tiết nhỏ thu xuống cỡ đó thì thành bùn, user mô tả đúng là
+   "như cảnh phim bị che mờ". Pixel art thật phải đặt tay từng điểm với bảng màu rất
+   tương phản, không phải thu nhỏ hình vector. ĐỪNG LÀM LẠI CÁCH ĐÓ.
+
+   Cảnh: nhìn từ ngoài vào mặt một toà nhà ban đêm, 8 thang máy lồng kính chạy dọc
+   bên ngoài tường, mỗi người một cabin. Tầng 20 là mái.
+   Trục y duy nhất là SỐ TẦNG. `camLo` = tầng thấp nhất đang hiện, `camCao` = số tầng
+   đang hiện; cả hai chạy mượt về đích.
+
+   Chữ vẫn đi qua `veChu()` rồi `xaChu()` vẽ sau cùng — không phải vì độ phân giải
+   nữa, mà để chữ luôn nằm trên mọi lớp và không bị cabin đè.                        */
+
+var ctxT = null, Wt = 0, Ht = 0, nenThap = null, khungThap = null, lanCuoiT = 0;
+var tiThap = 1, camLo = 0, camCao = 9, dichLo = 0, dichCao = 9;
+var LE_TRAI = 21, LE_PHAI = 8, CAO_BANG = 34;
+var loTrinh = null, hangChu = [], anhLoe = null, vigThap = null;
+
+var MOC_LO = { bang: 0, phieu: 2.0, chay: 3.3, roi: 4.5, giai: 5.0, tiep: 15.0 };
+
+function muot(t){ return t <= 0 ? 0 : t >= 1 ? 1 : t * t * (3 - 2 * t); }
+function bamT(a, b){ var x = Math.sin(a * 127.1 + b * 311.7) * 43758.5453; return x - Math.floor(x); }
+/* chừa 36px ở đáy: dưới cabin thấp nhất còn bảng tên + vạch hồ sơ + ✓✗, chừa 14 thì bị cắt */
+function hTang(){ return (Ht - CAO_BANG - 36) / camCao; }
+function yTang(t){ return Ht - 36 - (t - camLo) * hTang(); }
+function rongLan(){ return (Wt - LE_TRAI - LE_PHAI) / Math.max(1, ds.length); }
+function xLan(i){ return LE_TRAI + (i + .5) * rongLan(); }
+
+function veChu(s, x, y, cd, mau, canh, lot){
+  hangChu.push({ s: s, x: x, y: y, cd: cd, mau: mau, canh: canh || 'center', lot: lot });
+}
+function xaChu(g, px){
+  for (var i = 0; i < hangChu.length; i++){
+    var c = hangChu[i];
+    g.font = '800 ' + c.cd + 'px system-ui,-apple-system,sans-serif';
+    g.textAlign = c.canh;
+    if (c.lot){
+      var w = g.measureText(c.s).width;
+      var x0 = c.canh === 'right' ? c.x * px - w : c.canh === 'left' ? c.x * px : c.x * px - w / 2;
+      g.fillStyle = 'rgba(5,6,12,.78)';
+      g.fillRect(x0 - 3, c.y * px - c.cd + 1, w + 6, c.cd + 3);
+    }
+    g.fillStyle = c.mau;
+    g.fillText(c.s, c.x * px, c.y * px);
+  }
+  hangChu.length = 0;
+}
+
+function thapCo(){
+  var k = el('khungThap'), c = el('thap');
+  Wt = Math.max(220, k.clientWidth); Ht = Math.max(190, k.clientHeight);
+  tiThap = Math.min(window.devicePixelRatio || 1, 2);
+  c.style.width = Wt + 'px'; c.style.height = Ht + 'px';
+  c.width = Math.round(Wt * tiThap); c.height = Math.round(Ht * tiThap);
+  ctxT = c.getContext('2d');
+  ctxT.setTransform(tiThap, 0, 0, tiThap, 0, 0);
+  ctxT.imageSmoothingEnabled = true;
+  /* một hạt sáng vẽ sẵn, dùng lại cho mọi ô cửa và mọi cabin — tạo gradient
+     trăm lần mỗi khung hình thì tụt khung ngay */
+  anhLoe = document.createElement('canvas');
+  anhLoe.width = anhLoe.height = 64;
+  var gl = anhLoe.getContext('2d');
+  var gr = gl.createRadialGradient(32, 32, 0, 32, 32, 32);
+  gr.addColorStop(0, 'rgba(255,255,255,.85)');
+  gr.addColorStop(.35, 'rgba(255,255,255,.28)');
+  gr.addColorStop(1, 'rgba(255,255,255,0)');
+  gl.fillStyle = gr; gl.fillRect(0, 0, 64, 64);
+  vigThap = ctxT.createLinearGradient(0, 0, 0, Ht);
+  vigThap.addColorStop(0, 'rgba(0,0,0,.5)');
+  vigThap.addColorStop(.18, 'rgba(0,0,0,0)');
+  vigThap.addColorStop(.86, 'rgba(0,0,0,0)');
+  vigThap.addColorStop(1, 'rgba(0,0,0,.45)');
+  veNenThap();
+}
+
+function loe(g, x, y, r, mau, dam){
+  g.save();
+  g.globalCompositeOperation = 'lighter';
+  g.globalAlpha = dam;
+  g.fillStyle = mau;
+  g.drawImage(anhLoe, x - r, y - r, r * 2, r * 2);
+  g.restore();
+}
+
+/* ---------- trời đêm + thành phố phía xa (vẽ sẵn, không theo máy quay) ---------- */
+function veNenThap(){
+  var do2 = document.body.classList.contains('unknown');
+  nenThap = document.createElement('canvas');
+  nenThap.width = Math.round(Wt * tiThap); nenThap.height = Math.round(Ht * tiThap);
+  var g = nenThap.getContext('2d');
+  g.setTransform(tiThap, 0, 0, tiThap, 0, 0);
+
+  var gt = g.createLinearGradient(0, 0, 0, Ht);
+  if (do2){ gt.addColorStop(0, '#0e0407'); gt.addColorStop(.45, '#1d070c'); gt.addColorStop(1, '#49121b'); }
+  else    { gt.addColorStop(0, '#04060e'); gt.addColorStop(.45, '#080e1c'); gt.addColorStop(1, '#1a2742'); }
+  g.fillStyle = gt; g.fillRect(0, 0, Wt, Ht);
+
+  for (var i = 0; i < 90; i++){
+    var sx = bamT(i, 1) * Wt, sy = bamT(i, 2) * Ht * .72, r = .35 + bamT(i, 3) * .85;
+    g.fillStyle = 'rgba(255,255,255,' + (.1 + bamT(i, 4) * .45).toFixed(2) + ')';
+    g.beginPath(); g.arc(sx, sy, r, 0, 6.2832); g.fill();
+  }
+
+  /* TOÀ NHÀ PHÍA XA — lớp này mới là thứ làm cảnh có chiều sâu. Trước đây chỉ có
+     một mặt tường phẳng nên nhìn bẹt như hình nền. */
+  for (var b = 0; b < 7; b++){
+    var bw = 26 + bamT(b, 7) * 40;
+    var bx = -10 + b * (Wt + 20) / 6.4 - bw / 2;
+    var by = Ht * (.30 + bamT(b, 8) * .34);
+    g.fillStyle = do2 ? 'rgba(40,12,18,.85)' : 'rgba(13,19,34,.85)';
+    g.fillRect(bx, by, bw, Ht - by);
+    g.fillStyle = do2 ? 'rgba(70,22,30,.5)' : 'rgba(26,36,58,.5)';
+    g.fillRect(bx, by, bw, 2);
+    for (var wy = by + 7; wy < Ht - 6; wy += 9){
+      for (var wx = bx + 4; wx < bx + bw - 4; wx += 7){
+        if (bamT(wx * .7, wy * .3) < .70) continue;
+        g.fillStyle = do2 ? 'rgba(236,128,104,.5)' : 'rgba(255,214,150,.5)';
+        g.fillRect(wx, wy, 3, 4);
+      }
+    }
+  }
+  /* sương mù dưới chân, cho khối nhà xa chìm dần */
+  var gs = g.createLinearGradient(0, Ht * .55, 0, Ht);
+  gs.addColorStop(0, 'rgba(0,0,0,0)');
+  gs.addColorStop(1, do2 ? 'rgba(120,30,38,.5)' : 'rgba(58,80,120,.45)');
+  g.fillStyle = gs; g.fillRect(0, Ht * .55, Wt, Ht * .45);
+}
+
+/* ---------- mặt tường + cửa sổ ---------- */
+function veMatTien(g, hT, do2, nhip){
+  var yMai = yTang(TANG_DICH + .55);
+  if (yMai < Ht){
+    var gw = g.createLinearGradient(0, 0, Wt, 0);
+    if (do2){ gw.addColorStop(0, '#34141a'); gw.addColorStop(.3, '#220d12'); gw.addColorStop(1, '#16080b'); }
+    else    { gw.addColorStop(0, '#2a3348'); gw.addColorStop(.3, '#1c2438'); gw.addColorStop(1, '#121a2b'); }
+    g.fillStyle = gw; g.fillRect(0, Math.max(0, yMai), Wt, Ht - Math.max(0, yMai));
+    if (yMai > 0){
+      /* MÁI: lan can + cột ăng ten + đèn báo máy bay nhấp nháy */
+      g.fillStyle = do2 ? '#5e222d' : '#3b4766';
+      g.fillRect(-2, yMai - 7, Wt + 4, 8);
+      g.fillStyle = 'rgba(255,255,255,.12)'; g.fillRect(-2, yMai - 7, Wt + 4, 2);
+      var ax = Wt * .74;
+      g.fillStyle = do2 ? '#4a1b23' : '#2d3650';
+      g.fillRect(ax - 1.5, yMai - 34, 3, 28);
+      g.fillRect(ax - 7, yMai - 20, 14, 2);
+      var nhayDen = (Math.sin(nhip * 2.1) > .4);
+      if (nhayDen){
+        g.fillStyle = '#ff5a4a';
+        g.beginPath(); g.arc(ax, yMai - 35, 2.6, 0, 6.2832); g.fill();
+        loe(g, ax, yMai - 35, 11, '#ff5a4a', .5);
+      }
+    }
+  }
+
+  var t0 = Math.max(0, Math.floor(camLo) - 1), t1 = Math.min(TANG_DICH, Math.ceil(camLo + camCao) + 1);
+  var buoc = 26, wW = 14, hW = Math.max(5, Math.min(hT * .40, 19));
+  for (var t = t0; t <= t1; t++){
+    var yN = yTang(t), yS = yN - hT * .78;
+    g.fillStyle = 'rgba(0,0,0,.42)';
+    g.fillRect(0, yN - hT * .16, Wt, Math.max(2, hT * .13));
+    g.fillStyle = do2 ? 'rgba(255,170,150,.07)' : 'rgba(255,255,255,.055)';
+    g.fillRect(0, yN - hT * .16, Wt, 1);
+    for (var x = 5, c = 0; x < Wt - wW; x += buoc, c++){
+      var h1 = bamT(t * 3.7, c * 1.3);
+      if (h1 < .55){
+        g.fillStyle = do2 ? 'rgba(10,3,5,.8)' : 'rgba(6,10,20,.82)';
+        g.fillRect(x, yS, wW, hW);
+        g.fillStyle = 'rgba(255,255,255,.045)'; g.fillRect(x, yS, wW, 1);
+        continue;
+      }
+      var sang = .34 + (h1 - .55) * 1.3;
+      if (bamT(t * 5.1, c * 2.9) > .93) sang *= .4 + .6 * Math.abs(Math.sin(nhip * 8 + c));
+      var mauO = do2 ? 'rgba(255,150,120,' : 'rgba(255,220,150,';
+      g.fillStyle = mauO + sang.toFixed(2) + ')';
+      g.fillRect(x, yS, wW, hW);
+      /* rèm hoặc bóng người trong vài ô */
+      var kieu = bamT(t * 1.9, c * 4.4);
+      if (kieu > .80 && hW > 10){
+        g.fillStyle = 'rgba(22,16,10,.6)';
+        g.fillRect(x + wW * .28, yS + hW * .38, wW * .3, hW * .62);
+        g.beginPath(); g.arc(x + wW * .43, yS + hW * .34, wW * .13, 0, 6.2832); g.fill();
+      } else if (kieu < .22 && hW > 9){
+        g.fillStyle = 'rgba(30,22,12,.45)';
+        g.fillRect(x, yS, wW, hW * .34);
+      }
+      g.fillStyle = 'rgba(0,0,0,.5)'; g.fillRect(x, yS + hW * .5, wW, 1);
+      g.strokeStyle = 'rgba(0,0,0,.45)'; g.lineWidth = 1;
+      g.strokeRect(x + .5, yS + .5, wW - 1, hW - 1);
+      /* loè phải RẤT nhẹ: mỗi khung có cỡ trăm ô cửa, đậm một chút là cả mặt
+         tiền thành mù sương — đúng cái user chê ở bản trước. */
+      loe(g, x + wW / 2, yS + hW / 2, wW * .72, do2 ? '#ff9070' : '#ffd38a', sang * .13);
+    }
+  }
+
+  var lanR = rongLan();
+  for (var li = 0; li < ds.length; li++){
+    var lx = xLan(li);
+    g.fillStyle = 'rgba(3,5,10,.42)';
+    g.fillRect(lx - lanR * .38, CAO_BANG, lanR * .76, Ht);
+  }
+  g.fillStyle = do2 ? 'rgba(12,3,5,.9)' : 'rgba(4,7,13,.9)';
+  g.fillRect(0, 0, LE_TRAI - 3, Ht);
+  g.fillStyle = 'rgba(255,255,255,.06)'; g.fillRect(LE_TRAI - 3, 0, 1, Ht);
+
+  var yDat = yTang(-0.6);
+  if (yDat < Ht){
+    g.fillStyle = do2 ? '#16070a' : '#070b15';
+    g.fillRect(0, yDat, Wt, Ht - yDat);
+    g.fillStyle = do2 ? 'rgba(224,67,60,.35)' : 'rgba(228,185,74,.3)';
+    g.fillRect(0, yDat, Wt, 1.5);
+  }
+}
+
+/* ---------- vạch tầng ---------- */
+function veMocTang(g, hT, do2){
+  var t0 = Math.max(0, Math.floor(camLo) - 1), t1 = Math.min(TANG_DICH, Math.ceil(camLo + camCao) + 1);
+  var buocSo = hT >= 26 ? 1 : (hT >= 15 ? 2 : 5);
+  for (var t = t0; t <= t1; t++){
+    var y = yTang(t), dac = (t === TANG_KHONG_CO), moc = (t === TANG_UNKNOWN), ra = (t === TANG_DICH);
+    if (dac){
+      g.fillStyle = 'rgba(224,67,60,.55)'; g.fillRect(0, y - 1, Wt, 1.6);
+      loe(g, Wt / 2, y, Wt * .5, '#e0433c', .12);
+    }
+    if (moc){
+      g.fillStyle = 'rgba(224,67,60,.8)';
+      for (var gx = 2; gx < Wt - 4; gx += 11) g.fillRect(gx, y - 2.5, 6, 1.6);
+      if (hT > 18) veChu('VÙNG KHÔNG XÁC ĐỊNH', Wt - 5, Math.max(CAO_BANG + 11, y - 6), 8, '#e0433c', 'right', true);
+    }
+    if (ra){
+      g.fillStyle = 'rgba(228,185,74,.6)'; g.fillRect(0, y - 1, Wt, 1.6);
+      veChu('MÁI · CỬA RA', Wt - 5, Math.max(CAO_BANG + 11, y - 6), 8.5, '#e4b94a', 'right', true);
+    }
+    if (t % buocSo === 0 || dac || moc || ra){
+      veChu('' + t, LE_TRAI - 6, y - 2, 8.5,
+            dac || moc ? '#e0433c' : ra ? '#e4b94a' : 'rgba(165,180,215,.6)', 'right');
+    }
+  }
+}
+
+/* ---------- một cabin ---------- */
+function veCabin(g, p, hT, nhip, do2){
+  var lan = rongLan();
+  var wC = Math.min(lan - 7, 40), hC = Math.max(22, Math.min(hT * .82, 48));
+  var x = xLan(p.lan);
+  var y = yTang(p.tangHien) + (p.lech || 0);
+  var lac = p.dangChay ? Math.sin(nhip * 13 + p.lan) * 1.2 : Math.sin(nhip * 1.3 + p.lan) * .4;
+  x += lac;
+  var x0 = x - wC / 2;
+
+  /* ray đôi + cáp + đối trọng: thiếu cáp thì cabin nhìn như dán lên tường */
+  g.fillStyle = do2 ? 'rgba(110,52,58,.3)' : 'rgba(128,142,172,.17)';
+  g.fillRect(x0 - 3, CAO_BANG, 1.5, Ht); g.fillRect(x0 + wC + 1.5, CAO_BANG, 1.5, Ht);
+  g.fillStyle = do2 ? 'rgba(150,80,86,.28)' : 'rgba(160,175,205,.18)';
+  g.fillRect(x - .6, CAO_BANG, 1.2, Math.max(0, y - hC - CAO_BANG));
+  if (p.song || p.dangRoi){
+    var yDoi = Math.max(CAO_BANG + 6, y - hC - (Ht - hC) * .35);
+    g.fillStyle = do2 ? 'rgba(120,60,66,.4)' : 'rgba(140,155,185,.3)';
+    g.fillRect(x0 - 3.5, yDoi, 1.5, 13); g.fillRect(x0 + wC + 1.5, yDoi, 1.5, 13);
+  }
+
+  if (!p.song && !p.dangRoi) return;
+  var chet = !!p.dangRoi;
+  g.save();
+  if (p.mo !== undefined && p.mo < 1) g.globalAlpha = Math.max(0, p.mo);
+
+  /* bóng cabin hắt lên tường */
+  g.fillStyle = 'rgba(0,0,0,.45)';
+  g.fillRect(x0 + 4, y - hC + 4, wC, hC);
+
+  /* khung thép */
+  g.fillStyle = chet ? '#2d0d11' : (p.nguoi ? '#a98736' : '#39435c');
+  g.fillRect(x0 - 2, y - hC - 2, wC + 4, hC + 4);
+
+  /* kính + ánh đèn bên trong */
+  var gin = g.createLinearGradient(0, y - hC, 0, y);
+  if (chet){ gin.addColorStop(0, 'rgba(224,67,60,.55)'); gin.addColorStop(1, 'rgba(90,16,20,.4)'); }
+  else { gin.addColorStop(0, do2 ? 'rgba(255,196,170,.6)' : 'rgba(255,236,192,.62)');
+         gin.addColorStop(1, do2 ? 'rgba(150,70,62,.35)' : 'rgba(150,120,78,.35)'); }
+  g.fillStyle = gin; g.fillRect(x0, y - hC, wC, hC);
+
+  /* vệt kính chéo */
+  g.save();
+  g.beginPath(); g.rect(x0, y - hC, wC, hC); g.clip();
+  g.fillStyle = 'rgba(255,255,255,.17)';
+  g.beginPath(); g.moveTo(x0 - wC * .5, y + 4); g.lineTo(x0 - wC * .1, y + 4);
+  g.lineTo(x0 + wC * .8, y - hC - 4); g.lineTo(x0 + wC * .4, y - hC - 4); g.closePath(); g.fill();
+  g.restore();
+
+  /* người bên trong */
+  /* tư thế: +3 thì giơ tay mừng, bị trừ thì khom người — giữ tới hết vòng */
+  var tuThe = '';
+  if (loTrinh && loTrinh.t > MOC_LO.chay + .3){
+    if (p.doi === 3) tuThe = 'mung'; else if (p.doi < 0) tuThe = 'buon';
+  }
+  if (!p.nv || p.nv.ao !== p.mauAo) p.nv = ngoaiHinh(p.ten, p.mauAo);
+  var chopMat = ((nhip + p.lan * 1.37) % 4.1) < .13;
+  veNhanVat(g, x, y - 3 + Math.sin(nhip * 1.8 + p.lan * 2) * hC * .008, hC * .64, p.nv,
+            { hx: 0, hy: 1, chet: chet, tuThe: tuThe, chop: chopMat });
+
+  /* trần, sàn, đèn, bảng số tầng trên cabin */
+  g.fillStyle = 'rgba(0,0,0,.45)'; g.fillRect(x0, y - 3, wC, 3);
+  g.fillStyle = chet ? '#ff8a7a' : (p.nguoi ? '#fff0c8' : '#dfe8ff');
+  g.fillRect(x0 + 3, y - hC + 1, wC - 6, 1.6);
+  g.fillStyle = 'rgba(8,10,16,.8)';
+  g.fillRect(x0 + wC / 2 - 8, y - hC + 2.6, 16, 6.4);
+  veChu('' + Math.round(p.tangHien), x, y - hC + 8.3, 6.5,
+        chet ? '#ff6a63' : (p.nguoi ? '#e4b94a' : 'rgba(190,205,235,.9)'));
+
+  g.restore();
+
+  /* đèn cabin hắt ra tường: chỉ ĐÁY, bao quanh thì 8 cabin cùng tầng dính thành dải */
+  g.save();
+  if (p.mo !== undefined && p.mo < 1) g.globalAlpha = Math.max(0, p.mo);
+  loe(g, x, y + 2, wC * .7, chet ? '#ff5a4a' : (p.nguoi ? '#ffd98a' : '#cfe0ff'), .22);
+  g.restore();
+
+  /* lá phiếu trên nóc */
+  if (p.the){
+    var mat = p.the, co = 1;
+    if (loTrinh && loTrinh.t < MOC_LO.phieu) mat = '?';
+    else if (loTrinh && loTrinh.t < MOC_LO.phieu + .45){
+      co = Math.abs(Math.cos(Math.PI * (loTrinh.t - MOC_LO.phieu) / .45));
+      if (loTrinh.t - MOC_LO.phieu < .22) mat = '?';
+    }
+    veLaPhieu(g, x, y - hC - 6, Math.max(14, wC * .5), 15, mat, co);
+  }
+
+  if (p.noiLuc && performance.now() - p.noiLuc < 2600 && !loTrinh){
+    var bx = x + wC * .38, by = y - hC - 4;
+    g.fillStyle = 'rgba(240,244,255,.95)';
+    g.beginPath(); g.moveTo(bx, by + 9); g.lineTo(bx + 5, by + 2); g.lineTo(bx + 9, by + 2); g.closePath(); g.fill();
+    g.fillRect(bx, by - 9, 22, 12);
+    g.fillStyle = '#1a2030';
+    for (var bi = 0; bi < 3; bi++) g.fillRect(bx + 5 + bi * 5, by - 4, 2.4, 2.4);
+  }
+  veChu(p.ten, x, y + 13, 8, p.nguoi ? '#e4b94a' : 'rgba(196,208,230,.92)', 'center', true);
+  if (p.soHS && lan > 30){
+    var nb = Math.min(6, p.soHS);
+    for (var j = 0; j < nb; j++){
+      g.fillStyle = 'rgba(235,232,220,.65)';
+      g.fillRect(x - nb * 1.9 + j * 3.8, y + 16, 2.2, 3.4);
+    }
+  }
+  /* thành tích công khai: nói đúng / nói sai bao nhiêu lần — dữ kiện để bắt kẻ nói dối */
+  var tc = (p.dungCong || 0) + (p.saiCong || 0);
+  if (tc > 0){
+    veChu('✓' + (p.dungCong || 0), x - 1.5, y + 31, 8.5, '#5fe09a', 'right', true);
+    veChu('✗' + (p.saiCong || 0), x + 1.5, y + 31, 8.5, '#ff6a63', 'left', true);
+  }
+
+  if (loTrinh && p.doi && !p.dangRoi && loTrinh.t > MOC_LO.chay){
+    var ud = Math.min(1, (loTrinh.t - MOC_LO.chay) / 2.4);
+    if (ud < .97){
+      var nx = x + wC * .62;
+      if (nx > Wt - 22) nx = x - wC * .62;
+      veChu((p.doi > 0 ? '+' : '') + p.doi, nx, y - hC * .45 - ud * 26, 13,
+            p.doi === 3 ? '#e4b94a' : p.doi > 0 ? '#3fb97a' : '#e0a23c', 'center', true);
+    }
+  }
+}
+
+function veLaPhieu(g, x, y, w, h, mat, co){
+  if (co <= 0.02) return;
+  g.save(); g.translate(x, y); g.scale(co, 1);
+  var nen = mat === 'D' ? '#45d08c' : mat === 'S' ? '#ff6a63' : '#5b6782';
+  g.fillStyle = 'rgba(0,0,0,.5)'; g.fillRect(-w / 2 + 2, -h + 2, w, h);
+  g.fillStyle = nen; g.fillRect(-w / 2, -h, w, h);
+  g.fillStyle = 'rgba(255,255,255,.3)'; g.fillRect(-w / 2, -h, w, 2);
+  g.restore();
+  if (co > .5) veChu(mat === 'D' ? 'Đ' : mat === 'S' ? 'S' : '?', x, y - h * .22, h * .72, '#0b0d12');
+}
+
+/* ---------- bảng công bố ---------- */
+function veBangCongBo(g, do2){
+  var h = CAO_BANG;
+  var gb = g.createLinearGradient(0, 0, 0, h);
+  gb.addColorStop(0, do2 ? 'rgba(26,6,9,.96)' : 'rgba(6,9,16,.96)');
+  gb.addColorStop(1, do2 ? 'rgba(14,3,5,.96)' : 'rgba(3,5,10,.96)');
+  g.fillStyle = gb; g.fillRect(0, 0, Wt, h);
+  g.fillStyle = do2 ? 'rgba(224,67,60,.6)' : 'rgba(228,185,74,.45)';
+  g.fillRect(0, h - 2, Wt, 2);
+  loe(g, Wt / 2, h, Wt * .5, do2 ? '#e0433c' : '#e4b94a', .14);
+  g.fillStyle = 'rgba(255,255,255,.05)'; g.fillRect(0, 0, Wt, 1);
+
+  var giua = h * .66;
+  if (loTrinh){
+    var dap = loTrinh.dap, kq = loTrinh.kq;
+    if (loTrinh.t < MOC_LO.phieu){
+      if (loTrinh.t > .5 || Math.sin(loTrinh.t * 38) > 0){
+        veChu('ĐÁP ÁN', Wt / 2 - 8, giua, 14, 'rgba(150,162,186,.9)', 'right');
+        veChu(dap ? 'ĐÚNG' : 'SAI', Wt / 2 + 8, giua, 16, dap ? '#45d08c' : '#ff6a63', 'left');
+      }
+    } else {
+      veChu(dap ? 'ĐÁP ÁN: ĐÚNG' : 'ĐÁP ÁN: SAI', 6, giua, 12, dap ? '#45d08c' : '#ff6a63', 'left');
+      veChu('Đ ' + kq.soD, Wt - 44, giua, 12, '#45d08c', 'right');
+      veChu('S ' + kq.soS, Wt - 6, giua, 12, '#ff6a63', 'right');
+    }
+  } else {
+    veChu('VÒNG ' + vong, 6, giua, 11, 'rgba(150,162,186,.85)', 'left');
+    veChu('CÒN ' + Math.max(0, Math.round(TANG_DICH - (ban ? ban.tangHien : 0))) + ' TẦNG TỚI MÁI',
+          Wt - 6, giua, 11, 'rgba(228,185,74,.9)', 'right');
+  }
+}
+
+/* ---------- một khung ---------- */
+function veThap(dt){
+  var g = ctxT;
+  if (!g) return;
+  var k = Math.min(1, dt * 3.2);
+  camLo += (dichLo - camLo) * k; camCao += (dichCao - camCao) * k;
+  var nhip = performance.now() / 1000;
+  var do2 = document.body.classList.contains('unknown');
+  var hT = hTang();
+
+  var rung = 0;
+  if (loTrinh && loTrinh.daRoi && loTrinh.t < MOC_LO.roi + .55)
+    rung = (1 - (loTrinh.t - MOC_LO.roi) / .55) * 3.4;
+
+  g.clearRect(0, 0, Wt, Ht);
+  g.save();
+  if (rung > 0) g.translate((Math.random() - .5) * rung, (Math.random() - .5) * rung);
+  g.drawImage(nenThap, 0, 0, Wt, Ht);
+  veMatTien(g, hT, do2, nhip);
+  veMocTang(g, hT, do2);
+  for (var i = 0; i < ds.length; i++){
+    var p = ds[i];
+    veCabin(g, p, hT, nhip, do2);
+    if (!p.song && !p.dangRoi){
+      var yd = CAO_BANG + (Ht - CAO_BANG) * .5;
+      veChu(p.ten, xLan(p.lan), yd, 8, 'rgba(224,67,60,.85)', 'center', true);
+      g.fillStyle = 'rgba(224,67,60,.75)';
+      g.fillRect(xLan(p.lan) - 7, yd - 12, 14, 1.4);
+    }
+  }
+  g.restore();
+  veBangCongBo(g, do2);
+  g.fillStyle = vigThap; g.fillRect(0, 0, Wt, Ht);
+  xaChu(g, 1);
+}
+
+/* ---------- máy quay ---------- */
+function ngamThap(nhayNgay){
+  var song = ds.filter(function(p){ return p.song || p.dangRoi; });
+  var lo = TANG_DICH, hi = 0;
+  song.forEach(function(p){ lo = Math.min(lo, p.tangHien); hi = Math.max(hi, p.tangHien); });
+  if (!song.length){ lo = 0; hi = 0; }
+  var cao = Math.min(TANG_DICH + 1, Math.max(6, Math.ceil(hi - lo) + 2.6, Math.round(Ht / 62)));
+  var d = Math.max(-0.4, Math.min(TANG_DICH + 1 - cao, (lo + hi) / 2 - cao / 2 + .5));
+  dichLo = d; dichCao = cao;
+  if (nhayNgay){ camLo = d; camCao = cao; }
+}
+
+function thapDung(){
+  ds.forEach(function(p, i){
+    p.tangHien = p.tang; p.lan = i; p.the = null; p.dangRoi = false; p.lech = 0; p.mo = 1;
+    p.mauAo = p.nguoi ? '#c9a24a' : MAU_AO[i % MAU_AO.length];
+  });
+  loTrinh = null;
+  ngamThap(true);
+  if (!khungThap){ lanCuoiT = 0; khungThap = requestAnimationFrame(vongThap); }
+}
+
+/* ---------- chuỗi lộ kết quả ---------- */
+function batDauLo(kq, dap, xong){
+  ds.forEach(function(p){
+    p.tangCu = p.tangHien;
+    if (p.vuaLoai) p.dangRoi = true;
+  });
+  loTrinh = { t: 0, kq: kq, dap: dap, xong: xong, daChay: false, daRoi: false, daGiai: false };
+}
+function buocLo(dt){
+  var L = loTrinh;
+  L.t += dt;
+  var u = muot(Math.max(0, Math.min(1, (L.t - MOC_LO.chay) / 1.25)));
+  ds.forEach(function(p){
+    if (p.tangCu === undefined) return;
+    p.dangChay = (L.t > MOC_LO.chay && L.t < MOC_LO.chay + 1.3 && p.tang !== p.tangCu);
+    if (!p.dangRoi) p.tangHien = p.tangCu + (p.tang - p.tangCu) * u;
+    else {
+      var v = Math.max(0, Math.min(1, (L.t - MOC_LO.roi) / 1.6));
+      p.lech = v * v * hTang() * 7; p.mo = 1 - v * .9;
+    }
+  });
+  if (!L.daChay && L.t >= MOC_LO.chay){ L.daChay = true; hienKetBan(); }
+  if (!L.daRoi && L.t >= MOC_LO.roi && ds.some(function(p){ return p.dangRoi; })){ L.daRoi = true; AM.loai(); }
+  if (!L.daGiai && L.t >= MOC_LO.giai){ L.daGiai = true; hienGiaiThich(); }
+  ngamThap();
+  capNhatDemTiep(Math.max(0, MOC_LO.tiep - L.t));
+  if (L.t >= MOC_LO.tiep) ketThucLo();
+}
+function ketThucLo(){
+  if (!loTrinh) return;
+  var xong = loTrinh.xong;
+  loTrinh = null;
+  ds.forEach(function(p){
+    p.tangHien = p.tang; p.dangRoi = false; p.dangChay = false;
+    p.the = null; p.tangCu = undefined; p.lech = 0; p.mo = 1;
+  });
+  ngamThap();
+  xong();
+}
+
+function vongThap(ts){
+  khungThap = requestAnimationFrame(vongThap);
+  if (el('manVong').classList.contains('an')){
+    cancelAnimationFrame(khungThap); khungThap = null; lanCuoiT = 0; return;
+  }
+  var dt = lanCuoiT ? Math.min(.05, (ts - lanCuoiT) / 1000) : .016;
+  lanCuoiT = ts;
+  if (loTrinh) buocLo(dt);
+  veThap(dt);
+}
+
+function capNhatTangBan(){
+  el('tangBan').textContent = ban.tang;
+  el('conSong').textContent = ds.filter(function(p){ return p.song; }).length;
+}
+
+/* ---------------------------------------------------------------- PHÒNG HỒ SƠ
+   Phòng 2.5D đi lại được. Toạ độ "thế giới" tính bằng ô:
+     x 0..RW (ngang), y 0..RH (xa → gần). Chiếu xuống màn hình:
+       sx = wx*S                 (ngang giữ nguyên)
+       sy = Ly + wy*S*SAU        (SAU<1 nên sàn dẹt lại → thành góc nhìn chếch trên)
+       vật cao h ô thì đỉnh ở sy - h*S
+   Vẽ theo wy tăng dần nên vật ở gần che vật ở xa — đó là toàn bộ "chiều sâu".
+   Sàn + tường + vũng đèn (toàn gradient, đắt) được VẼ SẴN MỘT LẦN vào canvas nền;
+   mỗi khung chỉ vẽ lại đồ đạc + 8 người, nên chạy mượt trên điện thoại.          */
+
+var RW = 13.5, RH = 26, SAU = 0.58, CAO_TUONG = 4.6;
+var CUA_X = 6.75, CUA_RONG = 1.6;      /* cửa thang máy ở giữa tường sau */
+
+/* uuTien = người máy coi tập hồ sơ này quan trọng tới đâu. Con nào chịu đọc
+   (doc cao) thì càng bám theo thứ tự này; con nào không thì đi lung tung,
+   và THỰC ĐƠN CĂNG TIN lại nằm ngay giữa phòng — chỗ dễ sa vào nhất. */
+var TRAM = [
+  { id: 'qt',       x: 6.75, y: 21.2, kieu: 'buc',  w: 2.0, h: 1.1, uuTien: 1.00 },
+  { id: 'sotay',    x: 2.5,  y: 4.3,  kieu: 'tu',   w: 2.8, h: 1.2, uuTien: 0.92 },
+  { id: 'thongbao', x: 11.0, y: 5.6,  kieu: 'bang', w: 2.3, h: 0.6, uuTien: 0.66 },
+  { id: 'bienban',  x: 2.7,  y: 14.7, kieu: 'ban',  w: 2.8, h: 1.7, uuTien: 0.86 },
+  { id: 'nhatky',   x: 10.9, y: 18.0, kieu: 'ban',  w: 2.8, h: 1.7, uuTien: 0.72 },
+  { id: 'cangtin',  x: 6.75, y: 11.5, kieu: 'ban',  w: 3.2, h: 1.9, uuTien: 0.24 }
+];
+var SO_QUAN_TRONG = 5;                /* 5 tập đáng đọc, cái thứ 6 là thực đơn */
+
+var DO = [
+  { x: 4.0,  y: 8.4,  w: 0.9, h: 0.9, cao: 4.2, kieu: 'cot' },
+  { x: 9.5,  y: 8.4,  w: 0.9, h: 0.9, cao: 4.2, kieu: 'cot' },
+  { x: 10.8, y: 23.0, w: 2.2, h: 0.8, cao: 0.6, kieu: 'ghe' },
+  { x: 12.2, y: 12.6, w: 1.0, h: 1.0, cao: 1.5, kieu: 'nuoc' }
+];
+
+var DEN = [
+  { x: 6.75, y: 1.9,  r: 6.4, m: .30 }, { x: 2.5,  y: 4.9,  r: 5.0, m: .20 },
+  { x: 11.0, y: 6.4,  r: 5.0, m: .20 }, { x: 2.7,  y: 15.1, r: 4.8, m: .22 },
+  { x: 10.9, y: 18.4, r: 4.8, m: .22 }, { x: 6.75, y: 11.7, r: 5.6, m: .24 },
+  { x: 6.75, y: 21.6, r: 5.0, m: .22 }
+];
+
+var MAU_AO = ['#5d7093','#8e7a58','#6d5c92','#4f8a76','#93596b',
+              '#7b8a52','#55798f','#8c6a55','#6b8f58','#7f5a8c'];
+
+var henDoc = null, conLaiDoc = 0, daDoc = {}, trongPhong = false;
+var nguoiPhong = null, botPhong = [], ketQuaPhong = {};
+var nenPhong = null, ctxP = null, khungPhong = null, lanCuoi = 0, vigGrad = null;
+var S = 20, Ly = 0, Wc = 0, Hc = 0, tramGan = -1, nhanNut = '';
+var PXP = 3, boDemP = null, ctxManP = null;
+
+function chX(wx){ return wx * S; }
+function chY(wy){ return Ly + wy * S * SAU; }
+function iTL(id){ for (var i = 0; i < TAI_LIEU.length; i++) if (TAI_LIEU[i].id === id) return i; return 0; }
+
+/* ---------- cỡ sàn ---------- */
+function doLaiSan(){
+  /* cũng trò như toà nhà: vẽ vào bộ đệm nhỏ rồi phóng to không làm mềm.
+     Vì mọi cỡ trong phòng đều tính theo `S`, chỉ cần tính S từ cỡ BỘ ĐỆM
+     là cả căn phòng tự thu về lưới điểm ảnh — không phải sửa từng chỗ. */
+  var k = el('khungSan'), c = el('sanPhong');
+  var w = Math.max(240, k.clientWidth), h = Math.max(240, k.clientHeight);
+  PXP = 1;                      /* đã bỏ bản pixel: vẽ thẳng ở độ phân giải thật */
+  S = Math.min(w / RW, h / (CAO_TUONG + RH * SAU));
+  Wc = Math.round(RW * S); Hc = Math.round((CAO_TUONG + RH * SAU) * S);
+  Ly = CAO_TUONG * S;
+  var ti = Math.min(window.devicePixelRatio || 1, 2);
+  c.style.width = Wc + 'px'; c.style.height = Hc + 'px';
+  c.width = Math.round(Wc * ti); c.height = Math.round(Hc * ti);
+  ctxP = ctxManP = c.getContext('2d');
+  ctxP.setTransform(ti, 0, 0, ti, 0, 0);
+  vigGrad = ctxP.createRadialGradient(Wc / 2, Hc * 0.52, Math.min(Wc, Hc) * 0.22,
+                                      Wc / 2, Hc * 0.52, Math.max(Wc, Hc) * 0.8);
+  vigGrad.addColorStop(0, 'rgba(0,0,0,0)');
+  vigGrad.addColorStop(0.72, 'rgba(0,0,0,.2)');
+  vigGrad.addColorStop(1, 'rgba(0,0,0,.62)');
+  veNen();
+}
+
+/* ---------- nền vẽ sẵn: tường, cửa, sàn, vũng đèn ---------- */
+function veNen(){
+  var ti = Math.min(window.devicePixelRatio || 1, 2);
+  nenPhong = document.createElement('canvas');
+  nenPhong.width = Math.round(Wc * ti); nenPhong.height = Math.round(Hc * ti);
+  var g = nenPhong.getContext('2d');
+  g.setTransform(ti, 0, 0, ti, 0, 0);
+
+  /* --- tường sau --- */
+  var gt = g.createLinearGradient(0, 0, 0, Ly);
+  gt.addColorStop(0, '#1d2334'); gt.addColorStop(.6, '#151b29'); gt.addColorStop(1, '#0e131d');
+  g.fillStyle = gt; g.fillRect(0, 0, Wc, Ly);
+  for (var i = 1; i < 7; i++){
+    g.fillStyle = 'rgba(255,255,255,.013)'; g.fillRect(Math.round(Wc * i / 7), 0, 1.4, Ly);
+  }
+  /* đèn tường + quầng sáng đổ xuống */
+  [1.9, 6.75, 11.6].forEach(function(dx){
+    var sx = chX(dx), sy = Ly - CAO_TUONG * S * 0.82;
+    var gq = g.createLinearGradient(0, sy, 0, Ly);
+    gq.addColorStop(0, 'rgba(228,185,74,.16)'); gq.addColorStop(1, 'rgba(228,185,74,0)');
+    g.fillStyle = gq;
+    g.beginPath(); g.moveTo(sx - S * .4, sy); g.lineTo(sx + S * .4, sy);
+    g.lineTo(sx + S * 1.5, Ly); g.lineTo(sx - S * 1.5, Ly); g.closePath(); g.fill();
+    g.fillStyle = '#e8c766'; g.fillRect(sx - S * .36, sy - 3, S * .72, 3.4);
+    g.fillStyle = 'rgba(232,199,102,.35)'; g.fillRect(sx - S * .5, sy - 4.5, S * 1.0, 1.6);
+  });
+  /* chân tường */
+  g.fillStyle = '#0a0e16'; g.fillRect(0, Ly - 3, Wc, 3);
+
+  /* --- cửa thang máy --- */
+  var dx1 = chX(CUA_X - CUA_RONG), dx2 = chX(CUA_X + CUA_RONG);
+  var dTop = Ly - 3.3 * S, cx = (dx1 + dx2) / 2;
+  g.fillStyle = '#242b3a'; g.fillRect(dx1 - 5, dTop - 5, dx2 - dx1 + 10, Ly - dTop + 5);
+  var gd = g.createLinearGradient(dx1, 0, dx2, 0);
+  gd.addColorStop(0, '#2d3545'); gd.addColorStop(.42, '#3d475c');
+  gd.addColorStop(.5, '#1b2230'); gd.addColorStop(.58, '#3d475c'); gd.addColorStop(1, '#2d3545');
+  g.fillStyle = gd; g.fillRect(dx1, dTop, dx2 - dx1, Ly - dTop);
+  g.fillStyle = '#10151e'; g.fillRect(cx - 1, dTop + 3, 2, Ly - dTop - 6);
+  g.strokeStyle = '#4e5b74'; g.lineWidth = 1;
+  g.strokeRect(dx1 + .5, dTop + .5, dx2 - dx1 - 1, Ly - dTop - 1);
+  /* bảng số tầng */
+  var wB = Math.round(S * 1.1), hB = Math.round(S * .42);
+  g.fillStyle = '#080b11'; g.fillRect(cx - wB / 2, dTop - hB - 2, wB, hB);
+  g.fillStyle = '#e0433c'; g.fillRect(cx - wB / 2 + 1, dTop - hB - 1, Math.max(1, wB - 2), 1);
+  /* biển phòng */
+  /* Không viết chữ lên tường nữa: chữ vẽ vào bộ đệm rồi phóng to là nhòe hết.
+     Mọi chữ trong game phải đi qua veChu() để vẽ ở độ phân giải thật. */
+  g.fillStyle = 'rgba(139,148,169,.5)'; g.font = '700 8.5px system-ui,sans-serif';
+  g.textAlign = 'center';
+  g.fillText('PHÒNG LƯU HỒ SƠ', chX(3.1), Ly - 1.75 * S);
+  g.fillText('CẤM MANG RA', chX(10.4), Ly - 1.75 * S);
+
+  /* --- sàn --- */
+  var gf = g.createLinearGradient(0, Ly, 0, Hc);
+  gf.addColorStop(0, '#191e2b'); gf.addColorStop(.5, '#121724'); gf.addColorStop(1, '#090c13');
+  g.fillStyle = gf; g.fillRect(0, Ly, Wc, Hc - Ly);
+  g.strokeStyle = 'rgba(255,255,255,.03)'; g.lineWidth = 1;
+  for (var x = 0; x <= RW; x += 2){
+    g.beginPath(); g.moveTo(chX(x), Ly); g.lineTo(chX(x), Hc); g.stroke();
+  }
+  for (var y = 0; y <= RH; y += 2){
+    var sy2 = chY(y); g.beginPath(); g.moveTo(0, sy2); g.lineTo(Wc, sy2); g.stroke();
+  }
+  /* vệt bóng loáng trên sàn, cho sàn trông có chất liệu */
+  var gl = g.createLinearGradient(0, Ly, Wc * .7, Hc);
+  gl.addColorStop(0, 'rgba(255,255,255,.035)'); gl.addColorStop(.45, 'rgba(255,255,255,.008)');
+  gl.addColorStop(1, 'rgba(255,255,255,0)');
+  g.fillStyle = gl; g.fillRect(0, Ly, Wc, Hc - Ly);
+
+  /* --- vũng đèn --- */
+  g.globalCompositeOperation = 'lighter';
+  DEN.forEach(function(d){
+    var sx = chX(d.x), sy = chY(d.y), r = d.r * S;
+    g.save(); g.translate(sx, sy); g.scale(1, SAU);
+    var gr = g.createRadialGradient(0, 0, 0, 0, 0, r);
+    gr.addColorStop(0, 'rgba(228,185,74,' + d.m + ')');
+    gr.addColorStop(.5, 'rgba(228,185,74,' + (d.m * .3).toFixed(3) + ')');
+    gr.addColorStop(1, 'rgba(228,185,74,0)');
+    g.fillStyle = gr; g.beginPath(); g.arc(0, 0, r, 0, 6.2832); g.fill(); g.restore();
+  });
+  g.globalCompositeOperation = 'source-over';
+}
+
+/* ---------- hình khối 2.5D ---------- */
+function veHop(g, x, y, w, h, cao, mT, mF){
+  var x1 = chX(x - w / 2), x2 = chX(x + w / 2);
+  var yG = chY(y + h / 2), yX = chY(y - h / 2), cH = cao * S;
+  g.fillStyle = 'rgba(0,0,0,.45)';
+  g.beginPath();
+  g.ellipse((x1 + x2) / 2, yG + 1, (x2 - x1) / 2 * 1.05, (yG - yX) / 2 + 2.5, 0, 0, 6.2832);
+  g.fill();
+  g.fillStyle = mF; g.fillRect(x1, yG - cH, x2 - x1, cH);
+  g.fillStyle = mT;
+  g.beginPath(); g.moveTo(x1, yG - cH); g.lineTo(x2, yG - cH);
+  g.lineTo(x2, yX - cH); g.lineTo(x1, yX - cH); g.closePath(); g.fill();
+  g.fillStyle = 'rgba(255,255,255,.07)'; g.fillRect(x1, yG - cH, x2 - x1, 1.2);
+  g.strokeStyle = 'rgba(0,0,0,.5)'; g.lineWidth = 1;
+  g.strokeRect(x1 + .5, yX - cH + .5, x2 - x1 - 1, cH + (yG - yX) - 1);
+  return { x1: x1, x2: x2, yG: yG, yX: yX, dinh: yG - cH };
+}
+
+function veGiay(g, cx, cy, n, sang){
+  /* Mọi cỡ trong phòng phải tính theo S. Hồi canvas còn vẽ cỡ thật thì đặt
+     "14 pixel" cũng được; sang pixel art S chỉ còn ~8 nên số cứng thành to kệch. */
+  var w = Math.max(3, Math.round(S * .52)), h = Math.max(2, Math.round(S * .36));
+  var b = Math.max(1, Math.round(S * .07));
+  for (var i = 0; i < n; i++){
+    var ox = (i % 2 ? b : -b), oy = -i * b;
+    g.fillStyle = (i === n - 1) ? (sang ? '#fff9ea' : '#ddd8ca') : '#aca799';
+    g.fillRect(Math.round(cx - w / 2 + ox), Math.round(cy + oy - h), w, h);
+    g.fillStyle = 'rgba(0,0,0,.35)';
+    g.fillRect(Math.round(cx - w / 2 + ox), Math.round(cy + oy - 1), w, 1);
+  }
+}
+
+/* ---------- trạm hồ sơ ---------- */
+function veTram(g, t, i){
+  var tu = TU[i] || { ten: '?', to: [] };
+  var soDau = tu.to.filter(function(x){ return x.dau; }).length;
+  var trongTam = (tramGan === i), daXem = !!daDoc[i];
+  var k;
+  if (t.kieu === 'tu'){
+    k = veHop(g, t.x, t.y, t.w, t.h, 2.6, '#2c3444', '#1e2432');
+    for (var j = 0; j < 3; j++){
+      var hy = Math.round(k.dinh + S * .3 + j * ((k.yG - k.dinh - S * .3) / 3));
+      g.fillStyle = 'rgba(0,0,0,.45)'; g.fillRect(k.x1 + 1, hy, k.x2 - k.x1 - 2, 1);
+      g.fillStyle = 'rgba(255,255,255,.12)';
+      g.fillRect(Math.round((k.x1 + k.x2) / 2 - S * .25), hy + 1, Math.max(2, Math.round(S * .5)), 1);
+    }
+    veGiay(g, (k.x1 + k.x2) / 2, k.dinh + 1, 3, trongTam);
+  } else if (t.kieu === 'bang'){
+    k = veHop(g, t.x, t.y, t.w, t.h, 0.5, '#232a38', '#1a202c');
+    var bx = chX(t.x), by = k.dinh;
+    g.fillStyle = '#2a3140'; g.fillRect(bx - 2, by - 2.0 * S, 4, 2.0 * S);
+    g.fillStyle = '#3a4356'; g.fillRect(bx - t.w / 2 * S, by - 3.3 * S, t.w * S, 1.45 * S);
+    g.strokeStyle = '#4d5770'; g.lineWidth = 1;
+    g.strokeRect(bx - t.w / 2 * S + .5, by - 3.3 * S + .5, t.w * S - 1, 1.45 * S - 1);
+    for (var p = 0; p < 3; p++){
+      g.fillStyle = p === 1 ? (trongTam ? '#fff9ea' : '#ded9cb') : '#c3bdae';
+      g.fillRect(Math.round(bx - t.w / 2 * S + S * .2 + p * (t.w * S) / 3.4),
+                 Math.round(by - 3.1 * S), Math.max(2, Math.round(S * .4)), Math.max(3, Math.round(S * .6)));
+    }
+  } else if (t.kieu === 'buc'){
+    k = veHop(g, t.x, t.y, t.w, t.h, 1.35, '#2e3647', '#202733');
+    veGiay(g, (k.x1 + k.x2) / 2, k.dinh + 2, 4, trongTam);
+    g.fillStyle = '#e8c766'; g.fillRect(k.x1 + 1, k.dinh - 1, Math.max(1, Math.round(S * .2)), 1);
+  } else {
+    k = veHop(g, t.x, t.y, t.w, t.h, 1.05, '#313a4c', '#1f2531');
+    /* chân bàn */
+    g.fillStyle = '#171c26';
+    g.fillRect(k.x1 + 3, k.yG - 3, 3, 3); g.fillRect(k.x2 - 6, k.yG - 3, 3, 3);
+    veGiay(g, (k.x1 + k.x2) / 2 - 10, k.dinh + 2, 3, trongTam);
+    veGiay(g, (k.x1 + k.x2) / 2 + 12, k.dinh + 2, 2, false);
+    /* đèn bàn */
+    g.fillStyle = '#2b3242'; g.fillRect(k.x2 - Math.round(S * .4), k.dinh - Math.round(S * .62), 1, Math.round(S * .62));
+    g.fillStyle = '#e8c766'; g.fillRect(k.x2 - Math.round(S * .62), k.dinh - Math.round(S * .78),
+                                        Math.max(2, Math.round(S * .5)), Math.max(1, Math.round(S * .16)));
+  }
+
+  /* nhãn + dấu */
+  var nx = (k.x1 + k.x2) / 2, ny = k.yG + 11;
+  veChu(tu.ten, nx, ny, 9, trongTam ? '#e4b94a' : 'rgba(165,176,200,.9)', 'center', true);
+  veChu(tu.to.length + ' TỜ · ' + soDau + ' CÓ DẤU', nx, ny + 11, 7.5,
+        soDau ? 'rgba(95,224,154,.95)' : 'rgba(139,148,169,.7)');
+  if (daXem) veChu('ĐÃ ĐỌC', nx, ny + 21, 7.5, 'rgba(95,224,154,.95)');
+  if (trongTam){
+    g.strokeStyle = 'rgba(228,185,74,.75)'; g.lineWidth = 1.6;
+    g.beginPath();
+    g.ellipse(nx, k.yG + 1, (k.x2 - k.x1) / 2 + 7, (k.yG - k.yX) / 2 + 6, 0, 0, 6.2832);
+    g.stroke();
+  }
+}
+
+function veDo(g, v){
+  if (v.kieu === 'cot'){
+    var k = veHop(g, v.x, v.y, v.w, v.h, v.cao, '#242b39', '#1a202b');
+    g.fillStyle = 'rgba(255,255,255,.04)'; g.fillRect(k.x1 + 2, k.dinh, 2.5, k.yG - k.dinh);
+  } else if (v.kieu === 'ghe'){
+    veHop(g, v.x, v.y, v.w, v.h, v.cao, '#343c4e', '#232a36');
+  } else {
+    var k2 = veHop(g, v.x, v.y, v.w, v.h, v.cao, '#2b3342', '#1d2430');
+    g.fillStyle = 'rgba(120,180,220,.35)';
+    g.fillRect(k2.x1 + 1, k2.dinh + 1, Math.max(1, k2.x2 - k2.x1 - 2), Math.max(2, Math.round(S * .4)));
+  }
+}
+
+/* ================================================================ NHÂN VẬT
+   Vẽ người có NAM và NỮ (user xin 16/11/2026). Mỗi người có ngoại hình cố định:
+   giới, màu da, màu tóc, kiểu tóc, màu quần, có mặc váy hay không. Màu áo vẫn là
+   màu nhận dạng của người đó trên toà nhà.
+
+   Đơn vị u = cao/100, gốc là chân. Mốc dọc (tính từ chân lên):
+     giày 0–4 · gối 25 · hông 46 · eo 58 · vai 78 · cổ 80–84 · tâm đầu 91 · đỉnh 100.
+   Nam: vai rộng 13, eo 10.5, hông 10.  Nữ: vai 11, eo 8, hông 11 — chỉ chừng đó
+   khác biệt dáng là đủ, cộng tóc và váy thì nhìn ra ngay ở cỡ 30 điểm ảnh.
+
+   hướng: hy < -.25 là quay lưng (không có mặt, tóc dài phủ xuống lưng);
+          |hx| > .55 là đi ngang (thân hẹp lại, mặt lệch về phía đang đi).
+   tuThe: 'mung' (giơ hai tay, cười) · 'buon' (khom, cụp tay, miệng trễ) · thường.   */
+
+var NGOAI_HINH = {
+  'QUẠ':  { gioi: 'nam', da: '#e2b896', toc: '#1b1712', kieu: 'ngan', quan: '#2b2f3a' },
+  'CÚ':   { gioi: 'nu',  da: '#efc9a8', toc: '#3a2618', kieu: 'buoc', quan: '#3b3346', vay: true },
+  'CÁO':  { gioi: 'nu',  da: '#d9a882', toc: '#7a3a1c', kieu: 'dai',  quan: '#262a35' },
+  'RẮN':  { gioi: 'nam', da: '#c8936e', toc: '#141210', kieu: 'dinh', quan: '#33363f' },
+  'GẤU':  { gioi: 'nam', da: '#b98461', toc: '#221a14', kieu: 're',   quan: '#2c3340' },
+  'HẠC':  { gioi: 'nu',  da: '#f0cfb2', toc: '#16120f', kieu: 'bob',  quan: '#2f2b3a', vay: true },
+  'MỐI':  { gioi: 'nu',  da: '#dcae8a', toc: '#4a3020', kieu: 'dai',  quan: '#2a2e38' }
+};
+var NV_BAN = {
+  nam: { gioi: 'nam', da: '#e6bd9a', toc: '#1a1511', kieu: 're',   quan: '#2a2d36' },
+  nu:  { gioi: 'nu',  da: '#efcaa9', toc: '#1d1612', kieu: 'buoc', quan: '#2e2a38', vay: true }
+};
+function gioiBan(){ try { return localStorage.getItem('tcbg-tm-gioi') === 'nu' ? 'nu' : 'nam'; } catch (e){ return 'nam'; } }
+function ngoaiHinh(ten, ao){
+  var g = (ten === 'BẠN') ? NV_BAN[gioiBan()] : (NGOAI_HINH[ten] || NGOAI_HINH['QUẠ']);
+  return { gioi: g.gioi, da: g.da, toc: g.toc, kieu: g.kieu, quan: g.quan, vay: !!g.vay, ao: ao };
+}
+
+function toiDi(hex, k){
+  var n = parseInt(hex.slice(1), 16);
+  var r = Math.round(((n >> 16) & 255) * k), gg = Math.round(((n >> 8) & 255) * k), b = Math.round((n & 255) * k);
+  return 'rgb(' + r + ',' + gg + ',' + b + ')';
+}
+
+function veNhanVat(g, sx, sy, cao, nv, o){
+  o = o || {};
+  var u = cao / 100, nu = nv.gioi === 'nu';
+  var hy = (o.hy === undefined) ? 1 : o.hy, hx = o.hx || 0;
+  var sau = hy < -.25;
+  var ngang = (!sau && Math.abs(hx) > .55) ? (hx > 0 ? 1 : -1) : 0;
+  var ep = ngang ? .74 : 1;
+  var buoc = o.diBo ? Math.sin(o.pha || 0) : 0;
+  var tuThe = o.tuThe || '';
+  var chet = !!o.chet;
+  var ao = chet ? '#6b2328' : nv.ao, aoToi = chet ? '#4a171b' : toiDi(nv.ao, .72);
+  var da = chet ? '#8a5a52' : nv.da, daToi = toiDi(chet ? '#8a5a52' : nv.da, .82);
+  var toc = nv.toc, quan = chet ? '#3a1a1c' : nv.quan;
+  var khom = (tuThe === 'buon') ? 3.5 : 0;           /* cả người tụt xuống một chút */
+  var vien = 'rgba(8,10,16,.55)', lw = Math.max(.8, u * .9);
+
+  function X(v){ return sx + v * u * ep; }
+  function Y(v){ return sy - (v - (v > 46 ? khom * (v - 46) / 54 : 0)) * u; }
+  function poly(pts, mau, net){
+    g.beginPath(); g.moveTo(X(pts[0][0]), Y(pts[0][1]));
+    for (var i = 1; i < pts.length; i++) g.lineTo(X(pts[i][0]), Y(pts[i][1]));
+    g.closePath(); g.fillStyle = mau; g.fill();
+    if (net){ g.strokeStyle = vien; g.lineWidth = lw; g.stroke(); }
+  }
+  function elip(cx, cy, rx, ry, mau){
+    g.beginPath(); g.ellipse(X(cx), Y(cy), Math.max(.4, rx * u * ep), Math.max(.4, ry * u), 0, 0, 6.2832);
+    g.fillStyle = mau; g.fill();
+  }
+
+  var vaiR = nu ? 11 : 13, eoR = nu ? 8 : 10.5, hongR = nu ? 11 : 10;
+  var nhacT = Math.max(0, buoc) * 5, nhacP = Math.max(0, -buoc) * 5;   /* nhấc chân khi đi */
+  var ngoaiDau = 0;
+  if (ngang) ngoaiDau = ngang * 1.6;
+
+  /* --- tóc dài phía sau lưng (vẽ TRƯỚC thân) --- */
+  if (nu && (nv.kieu === 'dai' || (sau && nv.kieu === 'buoc'))){
+    var day = nv.kieu === 'dai' ? 66 : 74;
+    poly([[-9.5 + ngoaiDau, 93], [9.5 + ngoaiDau, 93], [10.5 + ngoaiDau, day], [-10.5 + ngoaiDau, day]], toc);
+  }
+  if (nu && nv.kieu === 'bob' && sau) poly([[-10, 93], [10, 93], [10.5, 82], [-10.5, 82]], toc);
+
+  /* --- chân / váy --- */
+  if (nv.vay){
+    poly([[-6, 33 - nhacT], [-2.2, 33 - nhacT], [-2.6, 4 + nhacT], [-5.6, 4 + nhacT]], da);
+    poly([[2.2, 33 - nhacP], [6, 33 - nhacP], [5.6, 4 + nhacP], [2.6, 4 + nhacP]], da);
+  } else {
+    poly([[-hongR + .5, 46], [-.8, 46], [-2.3, 4 + nhacT], [-7.4, 4 + nhacT]], quan, true);
+    poly([[.8, 46], [hongR - .5, 46], [7.4, 4 + nhacP], [2.3, 4 + nhacP]], quan, true);
+    poly([[.8, 46], [hongR - .5, 46], [7.4, 4 + nhacP], [5.2, 4 + nhacP]], 'rgba(0,0,0,.18)');
+  }
+  elip(-4.9, 2 + nhacT, 3.8, 2.2, '#16171c');
+  elip(4.9, 2 + nhacP, 3.8, 2.2, '#16171c');
+  if (nu) { elip(-4.9, 3 + nhacT, 2.4, 1.2, 'rgba(255,255,255,.12)'); }
+
+  /* --- tay sau (bên khuất) khi đi ngang --- */
+  var tayY = tuThe === 'mung' ? 99 : 49, tayX = vaiR + (tuThe === 'mung' ? 4 : 1.8);
+  var dongTay = buoc * 5;
+
+  /* --- thân áo --- */
+  if (nv.vay){
+    poly([[-eoR, 58], [eoR, 58], [13, 32], [-13, 32]], quan, true);           /* váy loe */
+    poly([[3, 58], [eoR, 58], [13, 32], [6, 32]], 'rgba(0,0,0,.2)');
+    poly([[-vaiR, 78], [vaiR, 78], [eoR + .5, 58], [-eoR - .5, 58]], ao, true);
+    poly([[2, 78], [vaiR, 78], [eoR + .5, 58], [2, 58]], 'rgba(0,0,0,.16)');
+  } else {
+    poly([[-vaiR, 78], [vaiR, 78], [eoR, 58], [hongR, 46], [-hongR, 46], [-eoR, 58]], ao, true);
+    poly([[2, 78], [vaiR, 78], [eoR, 58], [hongR, 46], [2, 46]], 'rgba(0,0,0,.16)');
+    if (!nu){ poly([[-hongR, 48.5], [hongR, 48.5], [hongR, 46], [-hongR, 46]], '#17181d'); }
+  }
+  /* cổ áo */
+  if (!sau){
+    if (nu) elip(0, 79, 4.2, 2.6, da);
+    else {
+      poly([[-4.5, 79.5], [-.3, 76], [-.3, 79.5]], 'rgba(238,240,245,.9)');
+      poly([[4.5, 79.5], [.3, 76], [.3, 79.5]], 'rgba(238,240,245,.9)');
+      poly([[-.5, 76], [.5, 76], [.6, 64], [-.6, 64]], 'rgba(0,0,0,.25)');
+    }
+  }
+
+  /* --- hai tay --- */
+  function tay(phia, lech){
+    var xv = phia * (vaiR - 1.2), xb = phia * tayX, yb = tayY + lech;
+    if (tuThe === 'buon'){ xb = phia * (vaiR - .5); yb = 50; }
+    g.beginPath();
+    g.moveTo(X(xv - phia * 2.2), Y(77)); g.lineTo(X(xv + phia * 2.2), Y(77));
+    g.lineTo(X(xb + phia * 2), Y(yb + 2)); g.lineTo(X(xb - phia * 2), Y(yb + 2));
+    g.closePath(); g.fillStyle = aoToi; g.fill();
+    g.strokeStyle = vien; g.lineWidth = lw; g.stroke();
+    elip(xb, yb, 2.4, 2.4, da);
+  }
+  if (!ngang || ngang < 0) tay(1, -dongTay);
+  if (!ngang || ngang > 0) tay(-1, dongTay);
+
+  /* --- cổ + đầu ---
+     Đầu phóng to 1.3 lần quanh gốc cổ: tỉ lệ thật (đầu = 1/6 người) thì vào cabin chỉ
+     còn ~30 điểm ảnh, mắt mũi mất hết. Đầu to kiểu nhân vật game thì đọc ra mặt ngay. */
+  poly([[-2.4, 79], [2.4, 79], [2.4, 84.5], [-2.4, 84.5]], daToi);
+  var TO_DAU = 1.3, gocX = X(0), gocY = Y(81);
+  g.save(); g.translate(gocX, gocY); g.scale(TO_DAU, TO_DAU); g.translate(-gocX, -gocY);
+  var dx = ngoaiDau;
+  if (!nu && !sau && !ngang){ elip(-8.6 + dx, 90, 1.5, 2.2, daToi); elip(8.6 + dx, 90, 1.5, 2.2, daToi); }
+  g.beginPath(); g.ellipse(X(dx), Y(91), 8.4 * u * (ngang ? .9 : 1), 9 * u, 0, 0, 6.2832);
+  g.fillStyle = da; g.fill(); g.strokeStyle = vien; g.lineWidth = lw; g.stroke();
+
+  /* --- tóc phía trước --- */
+  function chop(){                                  /* mũ tóc phủ nửa trên đầu */
+    g.beginPath(); g.ellipse(X(dx), Y(92.5), 9 * u * (ngang ? .92 : 1), 8.4 * u, 0, Math.PI * 1.02, Math.PI * 1.98);
+    g.closePath(); g.fillStyle = toc; g.fill();
+  }
+  if (sau){
+    g.beginPath(); g.ellipse(X(dx), Y(91), 9 * u, 9.4 * u, 0, 0, 6.2832); g.fillStyle = toc; g.fill();
+    if (nu && nv.kieu === 'buoc'){ elip(0, 86, 2.6, 4.5, toc); elip(0, 82, 2, 4, toc); }
+  } else {
+    chop();
+    var k = nv.kieu;
+    if (k === 'ngan'){
+      poly([[-8.6, 92], [8.6, 92], [8.2, 95.5], [-8.2, 95.5]], toc);
+    } else if (k === 're'){
+      poly([[-8.8, 91], [-2, 96.5], [8.6, 93], [8.8, 97], [-6, 99.5]], toc);
+      poly([[-8.8, 91.5], [-7.4, 91.5], [-7.4, 86], [-8.8, 87]], toc);
+    } else if (k === 'dinh'){
+      for (var i = -2; i <= 2; i++) poly([[i * 3.2 - 2, 97], [i * 3.2 + 2, 97], [i * 3.2 + .4, 101.8]], toc);
+      poly([[-8.6, 92.5], [8.6, 92.5], [8.2, 95.5], [-8.2, 95.5]], toc);
+    } else if (k === 'dai'){
+      poly([[-9.6 + dx, 94], [-6.8 + dx, 94], [-6.6 + dx, 76], [-10.2 + dx, 74]], toc);
+      poly([[9.6 + dx, 94], [6.8 + dx, 94], [6.6 + dx, 76], [10.2 + dx, 74]], toc);
+      poly([[-7.5 + dx, 95], [2 + dx, 97], [7.5 + dx, 94.5], [6 + dx, 91.5], [-6 + dx, 91.5]], toc);
+    } else if (k === 'bob'){
+      poly([[-10 + dx, 95], [-7 + dx, 95], [-7.2 + dx, 83], [-10.4 + dx, 82]], toc);
+      poly([[10 + dx, 95], [7 + dx, 95], [7.2 + dx, 83], [10.4 + dx, 82]], toc);
+      poly([[-8 + dx, 96], [8 + dx, 96], [7.6 + dx, 91.8], [-7.6 + dx, 91.8]], toc);
+    } else if (k === 'buoc'){
+      poly([[-8.2 + dx, 94], [8.2 + dx, 94], [7.8 + dx, 92.6], [-7.8 + dx, 92.6]], toc);
+      var bx = ngang ? -ngang * 9.5 : 9.6;
+      elip(bx + dx, 92, 2.4, 2.4, toc);                         /* búi */
+      poly([[bx + dx - 1.5, 91], [bx + dx + 1.5, 91], [bx + dx + 2.4, 79], [bx + dx - .4, 80]], toc);
+      elip(bx + dx, 92, 1.1, 1.1, '#c8486a');                    /* dây buộc */
+    }
+
+    /* --- mặt --- */
+    var mat = o.chop ? 'nham' : 'mo';
+    var mx = ngang ? ngang * 2.6 : 0;
+    var mauMat = '#141015';
+    if (mat === 'nham'){
+      poly([[-4.4 + mx, 89.6], [-1.8 + mx, 89.6], [-1.8 + mx, 89], [-4.4 + mx, 89]], mauMat);
+      poly([[1.8 + mx, 89.6], [4.4 + mx, 89.6], [4.4 + mx, 89], [1.8 + mx, 89]], mauMat);
+    } else {
+      if (!ngang || ngang < 0) elip(-3.1 + mx, 89.4, 1.15, 1.45, mauMat);
+      if (!ngang || ngang > 0) elip(3.1 + mx, 89.4, 1.15, 1.45, mauMat);
+      if (cao > 34){
+        if (!ngang || ngang < 0) elip(-2.8 + mx, 89.9, .4, .4, 'rgba(255,255,255,.8)');
+        if (!ngang || ngang > 0) elip(3.4 + mx, 89.9, .4, .4, 'rgba(255,255,255,.8)');
+      }
+    }
+    /* lông mày */
+    var nhuong = tuThe === 'buon' ? -.8 : 0;
+    poly([[-4.6 + mx, 92.6 + nhuong], [-1.8 + mx, 93.2], [-1.8 + mx, 92.5], [-4.6 + mx, 91.9 + nhuong]], toc);
+    poly([[4.6 + mx, 92.6 + nhuong], [1.8 + mx, 93.2], [1.8 + mx, 92.5], [4.6 + mx, 91.9 + nhuong]], toc);
+    /* má hồng (nữ) */
+    if (nu && cao > 26){ elip(-4.7 + mx, 86.8, 1.7, 1, 'rgba(232,110,120,.28)'); elip(4.7 + mx, 86.8, 1.7, 1, 'rgba(232,110,120,.28)'); }
+    /* miệng */
+    g.beginPath();
+    if (tuThe === 'mung'){ g.arc(X(mx), Y(86.2), 2.6 * u, .15 * Math.PI, .85 * Math.PI); }
+    else if (tuThe === 'buon'){ g.arc(X(mx), Y(84.2), 2.2 * u, 1.2 * Math.PI, 1.8 * Math.PI); }
+    else { g.moveTo(X(mx - 1.6), Y(85.6)); g.lineTo(X(mx + 1.6), Y(85.6)); }
+    g.strokeStyle = nu ? '#a8424e' : '#5a3a34'; g.lineWidth = Math.max(.8, u * .85); g.stroke();
+  }
+
+  g.restore();                                       /* hết phần đầu phóng to */
+
+  if (chet){                                         /* bị loại: phủ một lớp đỏ tối */
+    g.save(); g.globalAlpha = .25; g.fillStyle = '#e0433c';
+    g.fillRect(X(-14), Y(108), 28 * u * ep, 108 * u); g.restore();
+  }
+  return Y(107);
+}
+
+/* tương thích chỗ cũ: vẽ một người chung chung (không còn dùng cho nhân vật chính) */
+function veThanNguoi(g, sx, sy, cao, mau, hx, hy, pha, diBo){
+  return veNhanVat(g, sx, sy, cao, ngoaiHinh('QUẠ', mau), { hx: hx, hy: hy, pha: pha, diBo: diBo });
+}
+
+/* ---------- người trong phòng hồ sơ ---------- */
+function veNguoi(g, p){
+  var sx = chX(p.x), sy = chY(p.y);
+  var cao = 1.85 * S;
+  var nhun = p.diBo ? Math.abs(Math.sin(p.pha)) * cao * 0.035 : 0;
+  g.fillStyle = 'rgba(0,0,0,.5)';
+  g.beginPath(); g.ellipse(sx, sy, S * .33, S * .17, 0, 0, 6.2832); g.fill();
+  if (p.nguoi){
+    g.strokeStyle = 'rgba(228,185,74,.6)'; g.lineWidth = 1.6;
+    g.beginPath(); g.ellipse(sx, sy, S * .46, S * .24, 0, 0, 6.2832); g.stroke();
+  }
+  if (!p.nv) p.nv = ngoaiHinh(p.ten, p.mau);
+  var chop = ((performance.now() / 1000 + (p.x || 0) * 1.7) % 4.3) < .13;
+  var dinh = veNhanVat(g, sx, sy - nhun, cao, p.nv,
+                       { hx: p.hx, hy: p.hy, pha: p.pha, diBo: p.diBo, chop: chop });
+  if (p.viec === 'doc'){
+    var dauR = cao * .10, dY = dinh + dauR, r = dauR + 5;
+    var t = Math.max(0, Math.min(1, p.tienDoc));
+    g.strokeStyle = 'rgba(255,255,255,.18)'; g.lineWidth = 2;
+    g.beginPath(); g.arc(sx, dY, r, 0, 6.2832); g.stroke();
+    g.strokeStyle = '#e4b94a'; g.lineWidth = 2;
+    g.beginPath(); g.arc(sx, dY, r, -1.5708, -1.5708 + 6.2832 * t); g.stroke();
+    g.fillStyle = '#efe9d8';
+    g.fillRect(sx + dauR, dY + dauR, Math.max(2, Math.round(S * .26)), Math.max(2, Math.round(S * .34)));
+    dinh = Math.min(dinh, dY - r);
+  }
+  veChu(p.ten, sx, dinh - 2, 7.5,
+        p.nguoi ? '#e4b94a' : (p.viec === 'doc' ? '#e9edf6' : 'rgba(180,189,205,.85)'),
+        'center', true);
+}
+
+/* ---------- một khung ---------- */
+function veKhungPhong(){
+  var g = ctxP;
+  g.clearRect(0, 0, Wc, Hc);
+  g.drawImage(nenPhong, 0, 0, Wc, Hc);
+  var dsVe = [];
+  TRAM.forEach(function(t, i){ dsVe.push({ y: t.y, f: function(){ veTram(g, t, i); } }); });
+  DO.forEach(function(v){ dsVe.push({ y: v.y, f: function(){ veDo(g, v); } }); });
+  botPhong.forEach(function(b){ dsVe.push({ y: b.y, f: function(){ veNguoi(g, b); } }); });
+  dsVe.push({ y: nguoiPhong.y, f: function(){ veNguoi(g, nguoiPhong); } });
+  dsVe.sort(function(a, b){ return a.y - b.y; });
+  for (var i = 0; i < dsVe.length; i++) dsVe[i].f();
+  g.fillStyle = vigGrad; g.fillRect(0, 0, Wc, Hc);
+  xaChu(ctxManP, 1);
+}
+
+/* ---------- va chạm ---------- */
+function chanDuoc(x, y, r){
+  var i, o;
+  for (i = 0; i < TRAM.length; i++){
+    o = TRAM[i];
+    if (Math.abs(x - o.x) < o.w / 2 + r && Math.abs(y - o.y) < o.h / 2 + r) return true;
+  }
+  for (i = 0; i < DO.length; i++){
+    o = DO[i];
+    if (o.kieu === 'ghe') continue;
+    if (Math.abs(x - o.x) < o.w / 2 + r && Math.abs(y - o.y) < o.h / 2 + r) return true;
+  }
+  return false;
+}
+function diTheo(p, gx, gy, toc, dt){
+  var r = 0.38, nx = p.x + gx * toc * dt, ny = p.y + gy * toc * dt;
+  if (nx > .75 && nx < RW - .75 && !chanDuoc(nx, p.y, r)) p.x = nx;
+  if (ny > .9  && ny < RH - .8  && !chanDuoc(p.x, ny, r)) p.y = ny;
+  if (gx || gy){
+    var d = Math.hypot(gx, gy);
+    p.hx = gx / d; p.hy = gy / d; p.diBo = true; p.pha += dt * 11;
+  } else p.diBo = false;
+}
+function kcTram(t, p){
+  var dx = Math.max(Math.abs(p.x - t.x) - t.w / 2, 0);
+  var dy = Math.max(Math.abs(p.y - t.y) - t.h / 2, 0);
+  return Math.hypot(dx, dy);
+}
+
+/* ---------- người máy ---------- */
+function choDung(t){
+  return { x: t.x + (Math.random() - .5) * t.w * .7, y: t.y + t.h / 2 + .95 };
+}
+function botChonViec(b){
+  if (conLaiDoc < 11){            /* hết giờ: cả phòng kéo về phía thang máy */
+    b.viec = 'dao'; b.tram = -1; b.hen = 3;
+    b.dich = { x: CUA_X + (Math.random() - .5) * 7, y: 2.4 + Math.random() * 2.6 };
+    return;
+  }
+  if (b.soMuon > 0){
+    var tot = -1, cao = -1;
+    TRAM.forEach(function(t, i){
+      if (b.daXem[i]) return;
+      var kc = Math.hypot(t.x - b.x, t.y - b.y);
+      /* tranh cho dong: khong thi ca 10 con cung dung o mot cai buc */
+      var dong = 0;
+      for (var j = 0; j < botPhong.length; j++) if (botPhong[j] !== b && botPhong[j].tram === i) dong++;
+      var d = Math.pow(t.uuTien, 1 + 2.6 * b.doc) * (1 / (1 + kc / 7)) *
+              (1 / (1 + dong * 1.1)) * (.6 + Math.random() * .9);
+      if (d > cao){ cao = d; tot = i; }
+    });
+    if (tot >= 0){
+      b.viec = 'di'; b.tram = tot; b.dich = choDung(TRAM[tot]); b.hen = 14; return;
+    }
+  }
+  b.viec = 'dao'; b.tram = -1;
+  b.dich = { x: 1.6 + Math.random() * (RW - 3.2), y: 2.4 + Math.random() * (RH - 4.4) };
+  b.hen = 2 + Math.random() * 3;
+}
+function buocBot(b, dt){
+  b.hen -= dt;
+  if (b.viec === 'doc'){
+    b.tienDoc += dt / b.canDoc; b.diBo = false;
+    if (b.tienDoc >= 1){
+      b.daXem[b.tram] = true; b.soDoc++;
+      if (TRAM[b.tram].uuTien >= .6) b.soQT++;
+      b.soMuon--; b.viec = 'dung'; b.hen = .3 + Math.random() * 1.2;
+    }
+    return;
+  }
+  if (b.viec === 'dung'){ b.diBo = false; if (b.hen <= 0) botChonViec(b); return; }
+
+  var dx = b.dich.x - b.x, dy = b.dich.y - b.y, d = Math.hypot(dx, dy);
+  if (d < .35 || b.hen <= 0){
+    if (b.viec === 'di' && b.tram >= 0 && kcTram(TRAM[b.tram], b) < 1.25){
+      b.viec = 'doc'; b.tienDoc = 0; b.canDoc = 2.4 + Math.random() * 2.8;
+      b.hx = 0; b.hy = -1; b.diBo = false; return;
+    }
+    botChonViec(b); return;
+  }
+  var gx = dx / d, gy = dy / d;
+  /* KẸT: đi xiên ra một bên cộng một phần hướng cũ — trượt dọc theo cạnh bàn
+     thay vì đứng đẩy vào nó. Kẹt quá lâu thì bỏ việc, chọn việc khác. */
+  if (b.keo > .45){
+    var px = -gy * b.lech, py = gx * b.lech;
+    gx = px * .9 + gx * .3; gy = py * .9 + gy * .3;
+    var dd = Math.hypot(gx, gy) || 1; gx /= dd; gy /= dd;
+    if (b.keo > 2.2){ b.keo = 0; botChonViec(b); return; }
+  }
+  var tx = b.x, ty = b.y;
+  diTheo(b, gx, gy, b.toc, dt);
+  if (Math.hypot(b.x - tx, b.y - ty) < b.toc * dt * .4){
+    if (b.keo === 0) b.lech = Math.random() < .5 ? 1 : -1;
+    b.keo += dt;
+  } else b.keo = Math.max(0, b.keo - dt * 3);   /* đi được thì cờ kẹt phải tự tắt */
+}
+
+/* ---------- điều khiển ---------- */
+var joyP = { bam: false, id: null, ox: 0, oy: 0, gx: 0, gy: 0, manh: 0 };
+var phimP = {};
+var BK_JOY_P = 54;
+function noiDieuKhien(){
+  var c = el('sanPhong');
+  c.addEventListener('pointerdown', function(e){
+    if (!el('lopHS').classList.contains('an')) return;
+    joyP.bam = true; joyP.id = e.pointerId; joyP.ox = e.clientX; joyP.oy = e.clientY;
+    joyP.gx = joyP.gy = joyP.manh = 0;
+  });
+  c.addEventListener('pointermove', function(e){
+    if (!joyP.bam || e.pointerId !== joyP.id) return;
+    var dx = e.clientX - joyP.ox, dy = e.clientY - joyP.oy, d = Math.hypot(dx, dy);
+    if (d > BK_JOY_P){ joyP.ox += dx * (1 - BK_JOY_P / d); joyP.oy += dy * (1 - BK_JOY_P / d);
+                       dx *= BK_JOY_P / d; dy *= BK_JOY_P / d; d = BK_JOY_P; }
+    joyP.manh = d / BK_JOY_P;
+    if (d > 2){ joyP.gx = dx / d; joyP.gy = dy / d; } else { joyP.gx = joyP.gy = 0; }
+  });
+  function len(e){
+    if (e.pointerId !== joyP.id) return;
+    joyP.bam = false; joyP.id = null; joyP.gx = joyP.gy = joyP.manh = 0;
+  }
+  c.addEventListener('pointerup', len);
+  c.addEventListener('pointercancel', len);
+  window.addEventListener('keydown', function(e){
+    if (!trongPhong) return;
+    var k = e.key.toLowerCase();
+    phimP[k] = true;
+    if (k.indexOf('arrow') === 0 || k === ' ') e.preventDefault();
+    if (k === ' ' || k === 'enter') hanhDongTram();
+    if (k === 'escape') el('lopHS').classList.add('an');
+  });
+  window.addEventListener('keyup', function(e){ phimP[e.key.toLowerCase()] = false; });
+  window.addEventListener('resize', function(){
+    if (trongPhong) doLaiSan();
+    if (!el('manVong').classList.contains('an')) thapCo();
+  });
+}
+
+/* ---------- một bước ---------- */
+function buocPhong(dt){
+  var gx = 0, gy = 0, manh = 1;
+  if (el('lopHS').classList.contains('an')){
+    if (phimP['a'] || phimP['arrowleft']) gx -= 1;
+    if (phimP['d'] || phimP['arrowright']) gx += 1;
+    if (phimP['w'] || phimP['arrowup']) gy -= 1;
+    if (phimP['s'] || phimP['arrowdown']) gy += 1;
+    var dk = Math.hypot(gx, gy);
+    if (dk){ gx /= dk; gy /= dk; }
+    else if (joyP.manh > .12){ gx = joyP.gx; gy = joyP.gy; manh = Math.min(1, joyP.manh * 1.3); }
+  }
+  diTheo(nguoiPhong, gx, gy, 7.4 * manh, dt);
+  botPhong.forEach(function(b){ buocBot(b, dt); });
+
+  /* trạm gần nhất + nhãn nút */
+  var gan = -1, min = 1.25;
+  TRAM.forEach(function(t, i){ var k = kcTram(t, nguoiPhong); if (k < min){ min = k; gan = i; } });
+  tramGan = gan;
+  var trongThang = (nguoiPhong.y < 2.1 && Math.abs(nguoiPhong.x - CUA_X) < CUA_RONG + .6);
+  var nh, tat = false;
+  if (trongThang) nh = 'VÀO THANG MÁY →';
+  else if (gan >= 0) nh = 'ĐỌC · ' + TU[gan].ten;
+  else { nh = 'ĐI TỚI MỘT TẬP HỒ SƠ'; tat = true; }
+  if (nh !== nhanNut){
+    nhanNut = nh;
+    el('nutDocTram').textContent = nh;
+    el('nutDocTram').classList.toggle('tat', tat);
+  }
+}
+function hanhDongTram(){
+  if (!trongPhong) return;
+  if (!el('lopHS').classList.contains('an')){ el('lopHS').classList.add('an'); return; }
+  if (nguoiPhong.y < 2.1 && Math.abs(nguoiPhong.x - CUA_X) < CUA_RONG + .6){ roiPhongHoSo(); return; }
+  if (tramGan >= 0) moHoSo(tramGan);
+}
+function vongPhong(ts){
+  if (!trongPhong) return;
+  khungPhong = requestAnimationFrame(vongPhong);
+  var dt = lanCuoi ? Math.min(.05, (ts - lanCuoi) / 1000) : .016;
+  lanCuoi = ts;
+  buocPhong(dt);
+  veKhungPhong();          /* vẫn vẽ khi đang mở tờ hồ sơ: phòng phía sau phải còn sống */
+}
+
+/* ---------- vào / ra ---------- */
+function vaoPhongHoSo(){
+  taoHoSo(); ganCauVan();             /* toà nhà mới, hồ sơ mới, câu hỏi mới */
+  el('manLuat').classList.add('an');
+  el('manKet').classList.add('an');
+  el('manVong').classList.add('an');
+  el('manHoSo').classList.remove('an');
+  daDoc = {}; ketQuaPhong = {}; nhanNut = '';
+  el('demHS').innerHTML = TU.map(function(){ return '<i></i>'; }).join('');
+  el('goiY').style.opacity = '1';
+  setTimeout(function(){ if (trongPhong) el('goiY').style.opacity = '0'; }, 6500);
+
+  nguoiPhong = { ten: 'BẠN', nguoi: true, x: CUA_X + 2.25, y: 23.6, hx: 0, hy: 1,
+                 mau: '#c9a24a', pha: 0, diBo: false, viec: 'di' };
+  botPhong = MAU_MAY.map(function(m, i){
+    var g = i < 5 ? { x: 1.9 + i * 2.45, y: 2.8 + (i % 2) * 1.5 }
+                  : { x: 2.1 + (i - 5) * 2.4, y: 24.2 - (i % 2) * 1.6 };
+    return { ten: m.ten, nguoi: false, x: g.x, y: g.y, hx: 0, hy: 1, pha: Math.random() * 6,
+             mau: MAU_AO[i % MAU_AO.length], doc: m.doc, toc: 4.6 + m.doc * 1.6,
+             soMuon: Math.max(1, Math.round(1 + m.doc * 4.6)), daXem: [], soDoc: 0, soQT: 0,
+             viec: 'dung', tram: -1, dich: { x: g.x, y: g.y }, hen: Math.random() * 1.2,
+             tienDoc: 0, canDoc: 3, keo: 0, lech: 1, diBo: false };
+  });
+  conLaiDoc = GIAY_DOC;              /* phai dat TRUOC khi chia viec: botChonViec doc no */
+  botPhong.forEach(botChonViec);
+
+  trongPhong = true;
+  doLaiSan();
+  lanCuoi = 0;
+  if (khungPhong) cancelAnimationFrame(khungPhong);
+  khungPhong = requestAnimationFrame(vongPhong);
+
+  capNhatDongHoDoc();
+  if (henDoc) clearInterval(henDoc);
+  henDoc = setInterval(function(){
+    conLaiDoc -= 0.1;
+    capNhatDongHoDoc();
+    if (conLaiDoc <= 10.5 && Math.abs(conLaiDoc - Math.round(conLaiDoc)) < 0.05) AM.tich();
+    if (conLaiDoc <= 0){ clearInterval(henDoc); henDoc = null; roiPhongHoSo(); }
+  }, 100);
+}
+function capNhatDongHoDoc(){
+  var g = Math.max(0, Math.ceil(conLaiDoc));
+  var s = Math.floor(g / 60) + ':' + (g % 60 < 10 ? '0' : '') + (g % 60);
+  el('dongHoDoc').textContent = s;
+  el('dongHoDoc').classList.toggle('gap', g <= 15);
+  var dl = el('dongHoLop');
+  if (dl){ dl.textContent = s; dl.classList.toggle('gap', g <= 15); }
+  el('thanhDoc').style.width = Math.max(0, conLaiDoc / GIAY_DOC * 100) + '%';
+}
+function moHoSo(i){
+  var tu = TU[i];
+  daDoc[i] = true;
+  var o = el('demHS').children[i];
+  if (o) o.className = 'xong';
+  el('hsTen').textContent = tu.ten;
+  el('hsMeta').textContent = tu.to.length + ' tờ · đồng hồ vẫn chạy';
+  el('hsNoi').innerHTML = tu.to.map(function(d){
+    return '<div class="to-hs"><div class="ten-to">' + d.ten +
+      (d.dau ? ' <span class="dau">CÓ DẤU</span>' : ' <span class="khongdau">KHÔNG DẤU</span>') +
+      '</div><div class="ngay-to">' + d.ngay + '</div><ul>' +
+      d.noi.map(function(x){ return '<li>' + x + '</li>'; }).join('') + '</ul></div>';
+  }).join('');
+  el('lopHS').classList.remove('an');
+  AM.chon();
+}
+function roiPhongHoSo(){
+  if (henDoc){ clearInterval(henDoc); henDoc = null; }
+  if (khungPhong){ cancelAnimationFrame(khungPhong); khungPhong = null; }
+  trongPhong = false;
+  /* ghi lại người máy nào đã đọc được gì — chỗ này nối phòng hồ sơ vào ván chơi */
+  ketQuaPhong = {};
+  botPhong.forEach(function(b){
+    ketQuaPhong[b.ten] = { soDoc: b.soDoc, soQT: b.soQT, daXem: b.daXem.slice() };
+  });
+  soHSCuaBan = Object.keys(daDoc).length;
+  el('lopHS').classList.add('an');
+  el('manHoSo').classList.add('an');
+  el('manVong').classList.remove('an');
+  batDauVan();
+}
+var soHSCuaBan = 0;
+
+/* ---------------------------------------------------------------- NỐI NÚT */
+function veCap(){
+  var k = localStorage.getItem('tcbg-tm-cap') || 'thuong';
+  capMay = CAP_MAY[k] || CAP_MAY.thuong;
+  el('dsCap').innerHTML = Object.keys(CAP_MAY).map(function(x){
+    var c = CAP_MAY[x];
+    return '<button class="hs' + (x === k ? ' daDoc' : '') + '" data-c="' + x + '"' +
+      (x === k ? ' style="border-color:var(--nhan)"' : '') + '><span class="ten-hs">' +
+      c.hinh + ' ' + c.ten + (x === k ? ' <span class="dau">ĐANG CHỌN</span>' : '') +
+      '</span><span class="meta">' + c.mo + '</span></button>';
+  }).join('');
+  el('dsCap').querySelectorAll('.hs').forEach(function(b){
+    b.onclick = function(){ localStorage.setItem('tcbg-tm-cap', b.dataset.c); veCap(); AM.chon(); };
+  });
+}
+veCap();
+function veGioi(){
+  var hien = gioiBan();
+  el('chonGioi').innerHTML = ['nam', 'nu'].map(function(k){
+    return '<button class="gioi' + (k === hien ? ' chon' : '') + '" data-g="' + k + '">' +
+      '<canvas width="84" height="112"></canvas><span>' + (k === 'nam' ? 'Nam' : 'Nữ') + '</span></button>';
+  }).join('');
+  el('chonGioi').querySelectorAll('.gioi').forEach(function(b){
+    var c = b.querySelector('canvas'), g = c.getContext('2d');
+    var nv = NV_BAN[b.dataset.g]; nv = { gioi: nv.gioi, da: nv.da, toc: nv.toc, kieu: nv.kieu, quan: nv.quan, vay: !!nv.vay, ao: '#c9a24a' };
+    g.scale(c.width / 84, c.height / 112);
+    veNhanVat(g, 42, 106, 96, nv, {});
+    b.onclick = function(){ try { localStorage.setItem('tcbg-tm-gioi', b.dataset.g); } catch (e){} veGioi(); AM.chon(); };
+  });
+}
+veGioi();
+
+el('nutVao').onclick      = function(){ moAm(); vaoPhongHoSo(); };
+el('nutBoQua').onclick    = function(){ roiPhongHoSo(); };
+el('nutDocTram').onclick  = function(){ hanhDongTram(); };
+noiDieuKhien();
+el('nutDongHS').onclick   = function(){ el('lopHS').classList.add('an'); };
+el('nutDung2').onclick    = function(){ chon(true); };
+el('nutSai').onclick      = function(){ chon(false); };
+el('nutKhoa').onclick     = function(){ khoa(); };
+el('nutTiep').onclick     = function(){ if (loTrinh) ketThucLo(); };
+el('thap').addEventListener('pointerdown', function(){ if (loTrinh) ketThucLo(); });
+el('nutChoiLai').onclick  = function(){
+  el('manKet').classList.add('an');
+  el('manVong').classList.add('an');
+  document.body.classList.remove('unknown');
+  vaoPhongHoSo();
+};
+el('nutVeBoSuu').onclick  = function(){ location.href = 'tro-choi-bien-gioi.html'; };
+el('nutVeBoSuu2').onclick = function(){ location.href = 'tro-choi-bien-gioi.html'; };
+document.addEventListener('keydown', function(e){
+  if (el('manVong').classList.contains('an')) return;
+  if (e.key === 'ArrowLeft' || e.key === 'd' || e.key === 'D') chon(true);
+  if (e.key === 'ArrowRight' || e.key === 's' || e.key === 'S') chon(false);
+  if (e.key === 'Enter'){ if (loTrinh) ketThucLo(); else khoa(); }
+});
+
+/* =====================================================================
+   MÔ PHỎNG — để đo cân bằng mà không phải ngồi chơi 200 ván
+   ThangMay.moPhong(300, 'gioi')  → kiểu người chơi: gioi | theoDam | bua
+   ===================================================================== */
+function chayMoPhong(soVan, kieu){
+  var tong = { van: 0, vong: 0, banThang: 0, mayThang: 0, banLoai: 0, hetNguoi: 0,
+               daiNhat: 0, soLoai: 0, vongDaSoSai: 0, tongVong: 0, vongPha2: 0, coPha2: 0 };
+  for (var v = 0; v < soVan; v++){
+    taoHoSo(); ganCauVan();
+    var d = [{ ten: 'BẠN', nguoi: true, tang: TANG_BAT_DAU, song: true, chon: null }];
+    var docNgauNhien = function(muc){
+      return TRAM.map(function(t){ return Math.random() < Math.min(.95, .12 + muc * t.uuTien * .85); });
+    };
+    MAU_MAY.forEach(function(m){
+      d.push({ ten: m.ten, biet: m.biet, theoDam: m.theoDam, lieu: m.lieu, doc: m.doc,
+               heCap: capMay.he, tang: TANG_BAT_DAU, song: true, chon: null, daXemTram: docNgauNhien(m.doc) });
+    });
+    var docBan = docNgauNhien(.6);
+    chiaVai(d.filter(function(x){ return !x.nguoi; }));
+    var b = d[0], p = 1, ra = {}, sauSai = false, n = 0, xong = false;
+    while (!xong && n < 80){
+      n++;
+      var q = rutCau(CAU_HOI, ra, p);
+      ra[q.id] = true;
+      var tt = tinhTT(d, b, sauSai);
+      q._dap = chotDap(q, tt);
+
+      /* Máy chọn TRƯỚC (kể cả hợp sức trong chat), rồi người chơi giả mới chọn — vì có
+         1 phút 45 thảo luận, người thật nhìn thấy cả phòng đang nghiêng về đâu. Trước
+         đây "theo đám đông" nghĩa là theo thói quen q.n; giờ là theo phòng THẬT. */
+      var mayS = d.filter(function(x){ return !x.nguoi && x.song; });
+      mayS.forEach(function(x){ x._tuyen = undefined; x.ngheCG = null; x.chonDuKien = mayChon(x, q, tt); });
+      hopSuc(mayS, q);
+      var cgS = chuyenGiaCua(mayS, q);
+      theoChuyenGia(mayS, q);
+      mayS.forEach(function(x){
+        x.chon = x.chonDuKien;
+        var duS = q.hs && q.nguon.every(function(t){ return (x.daXemTram || [])[t]; });
+        x._ghi = x.noiDoi || (q.pha === 2 && x.chuyenMon === q.nh) || (q.hs ? duS : x.biet > .64);
+        tuyenBo(x);
+      });
+      var soDm = mayS.filter(function(x){ return x.chon; }).length;
+      var tt2 = { conSong: tt.conSong, tangCaoNhat: tt.tangCaoNhat, tangBan: tt.tangBan, banDanDau: tt.banDanDau,
+                  daSoSaiVongTruoc: tt.daSoSaiVongTruoc, damDongThat: soDm * 2 >= mayS.length };
+      if (kieu === 'gioi')        b.chon = q._dap;          /* biết hết, chơi hoàn hảo */
+      else if (kieu === 'theoDam') b.chon = tt2.damDongThat;  /* cứ theo phòng */
+      else if (kieu === 'thuong'){
+        /* tầng 16: nghe chuyên gia uy tín nhất; nhận ra kẻ nói dối qua ✓✗ khoảng 55% số lần */
+        if (p === 2 && cgS.length){
+          var cl = tuyenBo(cgS[0]);
+          b.chon = (cgS[0].noiDoi && Math.random() < .55) ? !cl : cl;
+        } else b.chon = mayChon({ biet: .80, theoDam: .55, lieu: .55, doc: .7, tang: b.tang, daXemTram: docBan }, q, tt2);
+      }
+      else if (kieu && kieu.biet)  b.chon = mayChon({ biet: kieu.biet, theoDam: kieu.theoDam, lieu: kieu.lieu, doc: kieu.doc || .7, tang: b.tang, daXemTram: docBan }, q, tt2);
+      else                         b.chon = Math.random() < 0.5;
+
+      mayS.forEach(function(x){ if (!x._ghi) return; if (x._tuyen === q._dap) x.dungCong++; else x.saiCong++; });
+      var kq = tinhVong(d, q._dap);
+      sauSai = kq.daSoSai;
+      if (kq.daSoSai) tong.vongDaSoSai++;
+      tong.tongVong++;
+      if (p === 1 && d.some(function(x){ return x.song && x.tang >= TANG_UNKNOWN; })){
+        p = 2; tong.vongPha2 += n; tong.coPha2++;
+      }
+      var th = d.filter(function(x){ return x.song && x.tang >= TANG_DICH; });
+      var so = d.filter(function(x){ return x.song; });
+      if (th.length){ xong = true; if (th.indexOf(b) >= 0) tong.banThang++; else tong.mayThang++; }
+      else if (!b.song){ xong = true; tong.banLoai++; }
+      else if (!so.length){ xong = true; tong.hetNguoi++; }
+    }
+    tong.van++; tong.vong += n;
+    if (n > tong.daiNhat) tong.daiNhat = n;
+    tong.soLoai += d.filter(function(x){ return !x.song; }).length;
+  }
+  return {
+    kieuNguoiChoi: (kieu && kieu.biet) ? ('biet' + kieu.biet + '/theo' + kieu.theoDam + '/lieu' + kieu.lieu) : kieu,
+    van: tong.van,
+    vongTrungBinh: +(tong.vong / tong.van).toFixed(1),
+    vongDaiNhat: tong.daiNhat,
+    banThang: +(tong.banThang / tong.van * 100).toFixed(1) + '%',
+    mayThangTruoc: +(tong.mayThang / tong.van * 100).toFixed(1) + '%',
+    banBiLoai: +(tong.banLoai / tong.van * 100).toFixed(1) + '%',
+    chetHet: +(tong.hetNguoi / tong.van * 100).toFixed(1) + '%',
+    soNguoiChetMoiVan: +(tong.soLoai / tong.van).toFixed(1) + '/' + (MAU_MAY.length + 1),
+    tyLeVongDaSoSai: +(tong.vongDaSoSai / tong.tongVong * 100).toFixed(1) + '%',
+    vaoVungKhongXacDinh: tong.coPha2 ? ('vòng ' + (tong.vongPha2 / tong.coPha2).toFixed(1) +
+      ' (' + (tong.coPha2 / tong.van * 100).toFixed(0) + '% số ván)') : 'không bao giờ'
+  };
+}
+
+window.ThangMay = {
+  moPhong: chayMoPhong,
+  datCap: function(k){ capMay = CAP_MAY[k] || CAP_MAY.thuong; return capMay.ten; },
+  _noiBo: function(){
+    return { ds: ds, cau: function(){ return cau; }, dap: function(){ return cau && cau._dap; },
+             datTang: function(i, t){ ds[i].tang = t; ds[i].tangHien = t; capNhatTangBan(); ngamThap(true); },
+             soCau: CAU_HOI.length, soTaiLieu: TAI_LIEU.length };
+  }
+};
+</script>
+</body>
+</html>
